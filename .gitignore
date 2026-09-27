@@ -1,0 +1,12 @@
+# Python virtual environment
+**/venv/
+**/.venv/
+
+# Python cache files
+**/__pycache__/
+**/*.pyc
+
+# Heavy weights and datasets
+**/*.pt
+**/*.onnx
+**/received_frames/

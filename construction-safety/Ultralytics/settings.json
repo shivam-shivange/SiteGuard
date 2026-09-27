@@ -1,0 +1,19 @@
+{
+  "settings_version": "0.0.8",
+  "datasets_dir": "D:\\projects\\MDM capstone\\construction-safety\\datasets",
+  "weights_dir": "weights",
+  "runs_dir": "runs",
+  "uuid": "778cba27a7e36f1e7d49d1d9252737ece969a39fa9cc29d554a2efe60d320755",
+  "sync": true,
+  "api_key": "",
+  "openai_api_key": "",
+  "clearml": true,
+  "comet": true,
+  "dvc": true,
+  "mlflow": true,
+  "raytune": true,
+  "tensorboard": false,
+  "wandb": false,
+  "vscode_msg": true,
+  "openvino_msg": true
+}
