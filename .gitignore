@@ -10,3 +10,9 @@
 **/*.pt
 **/*.onnx
 **/received_frames/
+
+# Explicitly ignore all image files and local database
+*.jpg
+*.jpeg
+*.png
+safety.db
