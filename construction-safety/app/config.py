@@ -66,6 +66,10 @@ MODEL_CONFIDENCE: float = min(CLASS_CONFIDENCE.values())
 # overlapping boxes, especially for "NO-Safety Vest" overlapping "Person".
 MODEL_IOU: float = float(os.getenv("SITEGUARD_MODEL_IOU", "0.40"))
 
+# Tracker configuration (BoT-SORT with Re-ID embeddings for occlusion recovery)
+TRACKER_CONFIG_PATH: Path = BASE_DIR / "app" / "detection" / "botsort_reid.yaml"
+TRACKER_NAME: str = os.getenv("SITEGUARD_TRACKER", str(TRACKER_CONFIG_PATH) if TRACKER_CONFIG_PATH.is_file() else "botsort.yaml")
+
 # ── Worker PPE monitoring ──────────────────────────────────────────────
 # Each tracked worker is observed over a sliding window.  A PPE item is
 # confirmed missing only when it is detected missing in at least

@@ -31,6 +31,7 @@ from app.config import (
     PPE_CONTAINMENT_MIN,
     PPE_LABELS,
     PREPROCESS,
+    TRACKER_NAME,
 )
 from app.detection.model_manager import model_manager
 from app.detection.preprocessor import preprocess
@@ -147,12 +148,12 @@ def run_inference(camera_id: str, frame: np.ndarray) -> InferenceResult:
     # ── 1. Optional preprocessing ──────────────────────────────────────
     processed = preprocess(frame) if PREPROCESS else frame
 
-    # ── 2. YOLO + ByteTrack ────────────────────────────────────────────
+    # ── 2. YOLO + Tracker (BoT-SORT with Re-ID / ByteTrack) ─────────────
     model = _get_camera_model(camera_id)
     result = model.track(
         processed,
         persist=True,
-        tracker="bytetrack.yaml",
+        tracker=TRACKER_NAME,
         conf=MODEL_CONFIDENCE,
         iou=MODEL_IOU,
         verbose=False,

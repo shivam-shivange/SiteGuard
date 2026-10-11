@@ -1,0 +1,19 @@
+# BoT-SORT Tracker configuration with Deep Re-ID Appearance Matching
+# Keeps worker track IDs stable across occlusions and intersecting paths.
+
+tracker_type: botsort
+track_high_thresh: 0.25
+track_low_thresh: 0.1
+new_track_thresh: 0.25
+track_buffer: 45
+match_thresh: 0.8
+fuse_score: True
+
+# Global motion compensation (stabilizes against jitter / moving nodes)
+gmc_method: sparseOptFlow
+
+# Re-ID Appearance settings
+proximity_thresh: 0.5
+appearance_thresh: 0.75
+with_reid: True
+model: auto
