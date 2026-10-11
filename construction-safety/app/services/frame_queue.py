@@ -35,6 +35,9 @@ class FrameProcessingQueue:
         self.total_frames_received = 0
         self.total_frames_processed = 0
         self.total_frames_dropped = 0
+        self.last_inference_ms = 0.0
+        self.last_fps = 0.0
+        self.last_processed_at = 0.0
 
     async def enqueue_frame(self, camera_id: str, frame: np.ndarray) -> bool:
         """Enqueue frame for processing. Returns True if queued, False if dropped due to overflow."""
@@ -87,6 +90,10 @@ class FrameProcessingQueue:
                 annotated_frame = inference_result.get("annotated_frame")
                 persons = inference_result.get("persons", [])
                 stats = inference_result.get("stats", {})
+
+                self.last_inference_ms = float(stats.get("inference_ms", 0.0))
+                self.last_fps = float(stats.get("fps", 0.0))
+                self.last_processed_at = time.time()
 
                 # Persist latest annotated frame and per-camera stats for the dashboard
                 if annotated_frame is not None:

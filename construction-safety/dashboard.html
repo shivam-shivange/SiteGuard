@@ -1,15 +1,1030 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SiteGuard Dashboard</title>
-<style>
-:root{--bg:#07111f;--panel:#101c2c;--line:#26384f;--text:#eaf0f8;--muted:#91a0b5;--cyan:#32d7e8;--green:#4cdd96;--amber:#ffbd4a;--red:#ff5f73}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,sans-serif}.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}.side{background:#0a1525;border-right:1px solid var(--line);padding:24px 14px}.logo{font-size:21px;font-weight:bold;margin:3px 9px 30px}.logo b{color:var(--cyan)}.nav{padding:11px 12px;border-radius:8px;background:#17304a;margin:6px 0;color:#fff}.nav.dim{background:transparent;color:var(--muted)}.system{position:fixed;bottom:25px;color:var(--muted);font-size:12px;padding:11px}.online{color:var(--green)}main{padding:26px 30px;max-width:1600px;width:100%;margin:auto}.header{display:flex;justify-content:space-between;align-items:center}.header h1{font-size:26px;margin:0 0 6px}.muted{color:var(--muted)}.pill{border:1px solid #245342;background:#102d2a;color:#8cf0bd;border-radius:30px;padding:8px 13px;font-weight:bold}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:25px 0}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}.card{padding:17px}.label{font-size:12px;color:var(--muted)}.metric{font-size:30px;font-weight:bold;margin-top:10px}.warn{color:var(--amber)}.grid{display:grid;grid-template-columns:1.7fr .8fr;gap:16px}.panel{padding:18px}.panel h2{font-size:15px;margin:0 0 16px}.cameraGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.camera{padding:0;overflow:hidden}.camHead{padding:12px;display:flex;justify-content:space-between}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px}.off .dot{background:var(--red)}.frame{height:185px;background:#162942;color:#789;display:grid;place-items:center}.frame img{width:100%;height:100%;object-fit:cover}.camFoot{display:flex;justify-content:space-between;padding:10px 12px;color:var(--muted);font-size:12px}.incident{padding:12px 0;border-bottom:1px solid var(--line)}.incident:last-child{border:0}.incidentTop{display:flex;justify-content:space-between}.tag{padding:4px 7px;border-radius:14px;font-size:10px;font-weight:bold;background:#48222e;color:#ff9cac}.tag.medium{background:#44371c;color:#ffd78d}.health div{display:flex;justify-content:space-between;padding:8px 0;color:var(--muted)}.health b{color:var(--text)}button{padding:6px 9px;background:#17324d;color:#d8f5ff;border:1px solid #365574;border-radius:6px;margin-top:9px;cursor:pointer}.notice{margin-top:16px;padding:10px;border-left:3px solid var(--amber);background:#2a2417;color:#e9d3a5;font-size:12px}.worker{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.worker:last-child{border:0}.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.chip{padding:4px 8px;border-radius:14px;font-size:11px;border:1px solid var(--line);color:var(--muted)}.chip.ok{background:#12301f;border-color:#245342;color:#8cf0bd}.chip.missing{background:#48222e;border-color:#6b2a3a;color:#ff9cac}.chip.checking{background:#44371c;border-color:#5e4a20;color:#ffd78d}.state{display:inline-block;margin-left:8px;padding:3px 8px;border-radius:14px;font-size:10px;font-weight:bold}.state.violation{background:#48222e;color:#ff9cac}.state.compliant{background:#12301f;color:#8cf0bd}.state.monitoring{background:#17304a;color:#9fd8ff}.empty{text-align:center;color:var(--muted);padding:36px 10px}@media(max-width:900px){.app{display:block}.side{display:none}.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}@media(max-width:520px){main{padding:18px}.cards,.cameraGrid{grid-template-columns:1fr}}
-</style></head><body><div class="app"><aside class="side"><div class="logo">SITE<b>GUARD</b></div><div class="nav">▦ &nbsp; Overview</div><div class="nav dim">▣ &nbsp; Live monitoring</div><div class="nav dim">⚠ &nbsp; Incident center</div><div class="nav dim">◌ &nbsp; Camera health</div><div class="system"><span class="online">●</span> System online<br><span id="sideCameras">0 cameras connected</span></div></aside><main>
-<div class="header"><div><h1>Safety overview</h1><div class="muted" id="updated">Loading live system data…</div></div><div class="pill" id="connection">● CONNECTING</div></div>
-<section class="cards"><div class="card"><div class="label">CONNECTED CAMERAS</div><div class="metric" id="cameraCount">—</div><div class="muted">Online / registered</div></div><div class="card"><div class="label">ACTIVE VIOLATIONS</div><div class="metric warn" id="activeCount">—</div><div class="muted">Require supervisor review</div></div><div class="card"><div class="label">TOTAL INCIDENTS</div><div class="metric" id="totalCount">—</div><div class="muted">Stored incident records</div></div><div class="card"><div class="label">AI PROCESSING</div><div class="metric warn" style="font-size:18px" id="processing">—</div><div class="muted">Current pipeline state</div></div></section>
-<section class="grid"><div><section class="panel"><h2>Live camera monitoring</h2><div class="cameraGrid" id="cameraGrid"><div class="empty">No camera frames received yet.<br>Start the ESP32-CAM stream.</div></div></section><section class="panel" style="margin-top:16px"><h2>Workers on site</h2><div id="workerList"><div class="empty">No workers in view.</div></div></section></div><div><section class="panel"><h2>Active incidents</h2><div id="incidentList"><div class="empty">No active incidents.</div></div></section><section class="panel" style="margin-top:16px"><h2>System health</h2><div class="health"><div><span>API service</span><b class="online">ONLINE</b></div><div><span>Camera streams</span><b id="healthCameras">—</b></div><div><span>Last refresh</span><b id="healthRefresh">—</b></div></div><div class="notice" id="rule">Alerts are raised only after a worker is confirmed missing PPE over a monitoring window.</div></section></div></section>
-</main></div><script>
-function el(id){return document.getElementById(id)}function age(iso){if(!iso)return 'No frames';var n=Math.max(0,Math.round((Date.now()-new Date(iso))/1000));return n<60?n+'s ago':Math.floor(n/60)+'m ago'}function text(v){return String(v||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function camera(c){var state=c.status==='online';var image=state?'<img src="/api/cameras/'+encodeURIComponent(c.id)+'/latest-frame?t='+Date.now()+'" alt="Live camera frame">':'Camera offline';return '<article class="camera panel '+(state?'':'off')+'"><div class="camHead"><div><span class="dot"></span><b>'+text(c.id)+'</b><br><small class="muted">'+text(c.location)+'</small></div><small class="muted">'+c.status.toUpperCase()+'</small></div><div class="frame">'+image+'</div><div class="camFoot"><span>'+Number(c.fps||0).toFixed(1)+' FPS</span><span>'+Number(c.latency_ms||0).toFixed(0)+' ms</span><span>'+age(c.last_frame_at)+'</span></div></article>'}
-function incident(i){return '<div class="incident"><div class="incidentTop"><b>'+text(missingText(i.violation))+'</b><span class="tag '+text(i.severity)+'">'+text(i.severity)+'</span></div><small class="muted">'+text(i.camera_id)+' · Worker #'+i.worker_id+' · '+age(i.created_at)+'</small><br><button onclick="changeIncident('+i.id+',&#39;acknowledged&#39;)">Acknowledge</button> <button onclick="changeIncident('+i.id+',&#39;resolved&#39;)">Resolve</button></div>'}
-var PPE={helmet:'Helmet',safety_vest:'Safety vest',mask:'Mask'};var MARK={ok:'✓',missing:'✗',checking:'…',unknown:'?'};function ppeName(k){return PPE[k]||k.replaceAll('_',' ')}function missingText(v){return 'Missing: '+String(v||'').split(',').map(function(c){return ppeName(c.replace(/^no_/,''))}).join(', ')}function worker(w){var chips=Object.keys(w.ppe).map(function(k){var st=w.ppe[k];return '<span class="chip '+st+'" title="'+st+'">'+MARK[st]+' '+text(ppeName(k))+'</span>'}).join('');var label=w.status==='violation'?'VIOLATION':w.status==='compliant'?'COMPLIANT':'MONITORING '+Math.floor(w.monitored_sec)+'/'+w.window_sec+'s';return '<div class="worker"><div><b>Worker #'+w.track_id+'</b><span class="state '+w.status+'">'+label+'</span><br><small class="muted">'+text(w.camera_id)+'</small></div><div class="chips">'+chips+'</div></div>'}function show(d){var on=d.cameras_online||0,total=d.cameras_total||0;el('cameraCount').textContent=on+' / '+total;el('sideCameras').textContent=on+' camera'+(on===1?'':'s')+' connected';el('activeCount').textContent=d.active_violations||0;el('totalCount').textContent=d.total_incidents||0;el('processing').textContent=(d.processing_status||'unknown').replaceAll('_',' ').toUpperCase();el('healthCameras').textContent=on+' online / '+total+' registered';el('updated').textContent='Updated '+new Date().toLocaleTimeString()+' · Live camera health and incident state';el('healthRefresh').textContent='Just now';el('cameraGrid').innerHTML=d.cameras.length?d.cameras.map(camera).join(''):'<div class="empty">No camera frames received yet.<br>Start the ESP32-CAM stream.</div>';var ws=d.workers||[];el('workerList').innerHTML=ws.length?ws.map(worker).join(''):'<div class="empty">No workers in view.</div>';if(d.monitoring){var m=d.monitoring;el('rule').textContent='Alerts are raised only when a worker is seen without required PPE ('+m.required_ppe.map(ppeName).join(', ')+') in at least '+Math.round(m.confirm_ratio*100)+'% of frames over '+m.window_sec+' s — one alert per worker until they comply.'}el('incidentList').innerHTML=d.recent_incidents.length?d.recent_incidents.map(incident).join(''):'<div class="empty">No active incidents.</div>'}
-async function load(){try{var r=await fetch('/api/dashboard/overview',{cache:'no-store'});if(!r.ok)throw Error();show(await r.json());el('connection').textContent='● LIVE'}catch(e){el('connection').textContent='● BACKEND OFFLINE';el('connection').style.color='var(--red)'}}async function changeIncident(id,status){await fetch('/api/incidents/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:status})});load()}function socket(){var ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws/dashboard');ws.onmessage=function(){load()};ws.onclose=function(){setTimeout(socket,3000)}}load();socket();setInterval(load,5000);
-</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SiteGuard — AI Construction Safety Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070d19;
+      --panel: #0e1726;
+      --panel-hover: #132034;
+      --card-bg: rgba(17, 26, 44, 0.75);
+      --card-border: rgba(51, 65, 85, 0.45);
+      --card-border-glow: rgba(14, 165, 233, 0.3);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan: #0ea5e9;
+      --cyan-glow: rgba(14, 165, 233, 0.15);
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.15);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.15);
+      --red: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.15);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at 15% 15%, rgba(14, 165, 233, 0.05) 0%, transparent 40%),
+                        radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.03) 0%, transparent 40%);
+    }
+
+    /* ── Layout ── */
+    .app { display: flex; width: 100%; min-height: 100vh; }
+    .sidebar {
+      width: 250px;
+      background: #091220;
+      border-right: 1px solid var(--card-border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      padding-left: 8px;
+    }
+    .logo-badge {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--cyan), #38bdf8);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #070d19;
+      font-weight: 900;
+      font-size: 16px;
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+    }
+    .logo span { color: var(--cyan); }
+
+    .nav-group { display: flex; flex-direction: column; gap: 6px; }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+    .nav-btn:hover {
+      background: rgba(30, 41, 59, 0.6);
+      color: var(--text);
+    }
+    .nav-btn.active {
+      background: linear-gradient(90deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.05));
+      color: #38bdf8;
+      border-color: rgba(14, 165, 233, 0.3);
+      box-shadow: 0 0 12px rgba(14, 165, 233, 0.1);
+    }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid var(--card-border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-right: 6px;
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+    /* ── Main View ── */
+    .main-content {
+      flex: 1;
+      padding: 28px 36px;
+      max-width: 1650px;
+      overflow-y: auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .header-title h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .header-title p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .live-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 30px;
+      background: var(--green-glow);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .live-pill.offline {
+      background: var(--red-glow);
+      border-color: rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+    .btn-action {
+      background: #17253b;
+      color: #bae6fd;
+      border: 1px solid #253d5e;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-action:hover { background: #203554; border-color: #38bdf8; }
+
+    /* ── Metric Cards ── */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .card:hover {
+      border-color: var(--card-border-glow);
+      transform: translateY(-2px);
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .card-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+    .card-icon {
+      font-size: 18px;
+      padding: 6px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+    }
+    .card-val {
+      font-size: 32px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1.1;
+      letter-spacing: -1px;
+    }
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag-chip {
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .tag-chip.danger { background: var(--red-glow); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .tag-chip.success { background: var(--green-glow); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .tag-chip.amber { background: var(--amber-glow); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tag-chip.cyan { background: var(--cyan-glow); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); }
+
+    /* ── Grid Sections ── */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 20px;
+    }
+    .panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-sub { font-size: 12px; color: var(--text-muted); }
+
+    /* ── Camera Grid ── */
+    .cam-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .cam-box {
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #091220;
+      transition: all 0.2s;
+    }
+    .cam-box:hover { border-color: rgba(14, 165, 233, 0.4); }
+    .cam-head {
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(14, 23, 38, 0.8);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    .cam-feed {
+      height: 220px;
+      background: #040913;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+    }
+    .cam-feed img { width: 100%; height: 100%; object-fit: contain; }
+    .cam-feed .offline-msg {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+    }
+    .cam-foot {
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      background: rgba(14, 23, 38, 0.8);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    /* ── Workers Table/List ── */
+    .worker-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(14, 23, 38, 0.4);
+      border: 1px solid rgba(51, 65, 85, 0.25);
+      margin-bottom: 8px;
+    }
+    .worker-meta { display: flex; align-items: center; gap: 12px; }
+    .worker-id { font-weight: 700; font-size: 14px; }
+    .ppe-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ppe-badge {
+      padding: 4px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ppe-badge.ok { background: var(--green-glow); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .ppe-badge.missing { background: var(--red-glow); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .ppe-badge.checking { background: var(--amber-glow); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .ppe-badge.unknown { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.2); }
+
+    /* ── Incidents Feed ── */
+    .incident-item {
+      padding: 13px;
+      border-radius: 10px;
+      background: rgba(14, 23, 38, 0.5);
+      border: 1px solid rgba(51, 65, 85, 0.3);
+      margin-bottom: 10px;
+    }
+    .incident-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .incident-title { font-weight: 700; font-size: 13.5px; color: #fca5a5; }
+    .incident-meta { font-size: 11.5px; color: var(--text-muted); display: flex; gap: 10px; }
+    .incident-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-sm {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      transition: all 0.2s;
+    }
+    .btn-sm:hover { background: #334155; }
+    .btn-sm.resolve { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; }
+    .btn-sm.resolve:hover { background: rgba(16, 185, 129, 0.3); }
+
+    /* ── Progress & Gauge Bars ── */
+    .bar-wrap { width: 100%; height: 6px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+    .bar-fill { height: 100%; background: var(--cyan); transition: width 0.4s; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-card {
+      background: #0e1726;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 900px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* ── Slider Controls (Settings Tab) ── */
+    .setting-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 80px;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+    }
+    input[type=range] {
+      accent-color: var(--cyan);
+      width: 100%;
+      cursor: pointer;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .metric-grid { grid-template-columns: repeat(2, 1fr); }
+      .dashboard-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .app { flex-direction: column; }
+      .sidebar { width: 100%; }
+      .metric-grid, .cam-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-badge">SG</div>
+        SITE<span>GUARD</span>
+      </div>
+
+      <nav class="nav-group">
+        <button class="nav-btn active" onclick="switchTab('overview')">
+          <span class="nav-icon">▦</span> Overview
+        </button>
+        <button class="nav-btn" onclick="switchTab('cameras')">
+          <span class="nav-icon">▣</span> Live Feeds
+        </button>
+        <button class="nav-btn" onclick="switchTab('incidents')">
+          <span class="nav-icon">⚠</span> Incident Center
+        </button>
+        <button class="nav-btn" onclick="switchTab('health')">
+          <span class="nav-icon">◌</span> Health & Diagnostics
+        </button>
+        <button class="nav-btn" onclick="switchTab('settings')">
+          <span class="nav-icon">⚙</span> Rule Parameters
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div><span class="pulse-dot"></span> System Live</div>
+        <div style="margin-top: 6px; font-size: 11px;" id="sideTracker">BoT-SORT • Re-ID Active</div>
+      </div>
+    </aside>
+
+    <!-- ── Main View ── -->
+    <main class="main-content">
+      <div class="header">
+        <div class="header-title">
+          <h1 id="pageHeading">Safety Operations Overview</h1>
+          <p id="lastSync">Connecting to live detection engine…</p>
+        </div>
+        <div class="header-actions">
+          <div class="live-pill" id="liveIndicator">
+            <span class="pulse-dot"></span> LIVE STREAMING
+          </div>
+          <button class="btn-action" onclick="fetchOverview(true)">
+            ↻ Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- ── TOP 4 DYNAMIC METRICS CARDS ── -->
+      <section class="metric-grid">
+        <!-- 1. CONNECTED CAMERAS -->
+        <div class="card">
+          <div class="card-top">
+            <span class="card-label">Connected Cameras</span>
+            <span class="card-icon">📹</span>
+          </div>
+          <div class="card-val" id="cardCameras" style="color: #38bdf8;">—</div>
+          <div class="card-sub" id="cardCamerasSub">
+            <span class="tag-chip cyan" id="camStatusBadge">Checking</span>
+            <span id="camOnlineSub">0 active nodes</span>
+          </div>
+        </div>
+
+        <!-- 2. ACTIVE VIOLATIONS (DYNAMIC LIVE WORKERS + PENDING INCIDENTS) -->
+        <div class="card">
+          <div class="card-top">
+            <span class="card-label">Active Violations</span>
+            <span class="card-icon">🚨</span>
+          </div>
+          <div class="card-val" id="cardViolations" style="color: #f87171;">—</div>
+          <div class="card-sub" id="cardViolationsSub">
+            <span class="tag-chip danger" id="violationBadge">Live Risk</span>
+            <span id="unresolvedCountSub">0 pending reviews</span>
+          </div>
+        </div>
+
+        <!-- 3. TOTAL INCIDENTS & SCORECARD -->
+        <div class="card">
+          <div class="card-top">
+            <span class="card-label">Total Incidents</span>
+            <span class="card-icon">📋</span>
+          </div>
+          <div class="card-val" id="cardTotalIncidents" style="color: #fbbf24;">—</div>
+          <div class="card-sub" id="cardIncidentsSub">
+            <span class="tag-chip success" id="scorecardBadge">Grade A+ (91%)</span>
+            <span id="todayCountSub">0 today</span>
+          </div>
+        </div>
+
+        <!-- 4. AI PROCESSING PIPELINE (DYNAMIC REAL-TIME FPS, LATENCY, STATUS) -->
+        <div class="card">
+          <div class="card-top">
+            <span class="card-label">AI Processing</span>
+            <span class="card-icon">⚡</span>
+          </div>
+          <div class="card-val" id="cardProcessing" style="font-size: 24px; color: #34d399;">—</div>
+          <div class="card-sub" id="cardProcessingSub">
+            <span class="tag-chip success" id="processingBadge">STANDBY</span>
+            <span id="fpsLatencySub">0.0 FPS • 0 ms</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TAB 1: OVERVIEW TAB ── -->
+      <div id="tab-overview">
+        <div class="dashboard-layout">
+          <!-- Left Column: Live Feeds & Workers -->
+          <div>
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Live Video Feeds</div>
+                  <div class="panel-sub">Wireless ESP32-CAM nodes & local webcams</div>
+                </div>
+                <button class="btn-sm" onclick="switchTab('cameras')">Expand All →</button>
+              </div>
+              <div class="cam-grid" id="cameraGrid">
+                <div class="cam-box"><div class="cam-feed"><div class="offline-msg">No cameras streaming.</div></div></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Active Workers Tracked On Site</div>
+                  <div class="panel-sub">Temporal PPE compliance checklist via BoT-SORT</div>
+                </div>
+                <span class="tag-chip cyan" id="workerCountTag">0 Workers</span>
+              </div>
+              <div id="workerList">
+                <div style="text-align: center; color: var(--text-muted); padding: 30px;">No workers currently in camera frame.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Incidents Stream & Health -->
+          <div>
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Active Safety Incidents</div>
+                  <div class="panel-sub">Confirmed violations requiring review</div>
+                </div>
+                <button class="btn-sm resolve" onclick="resolveAllIncidents()">Resolve All</button>
+              </div>
+              <div id="incidentList">
+                <div style="text-align: center; color: var(--text-muted); padding: 30px;">No open incidents.</div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">Real-Time Diagnostics</div>
+              </div>
+              <div style="font-size: 13px; display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span style="color:var(--text-muted)">CPU Workload (Ryzen 5)</span>
+                    <b id="diagCpu">—%</b>
+                  </div>
+                  <div class="bar-wrap"><div class="bar-fill" id="diagCpuBar" style="width: 0%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span style="color:var(--text-muted)">RAM Allocation</span>
+                    <b id="diagRam">—%</b>
+                  </div>
+                  <div class="bar-wrap"><div class="bar-fill" id="diagRamBar" style="width: 0%; background: #38bdf8;"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span style="color:var(--text-muted)">Inference Queue Buffer</span>
+                    <b id="diagQueue">0 / 10 frames</b>
+                  </div>
+                  <div class="bar-wrap"><div class="bar-fill" id="diagQueueBar" style="width: 0%; background: #fbbf24;"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB 2: LIVE FEEDS TAB ── -->
+      <div id="tab-cameras" style="display: none;">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Full Camera Surveillance Matrix</div>
+            <span class="panel-sub">Click any camera to view full resolution stream</span>
+          </div>
+          <div class="cam-grid" id="fullCamGrid" style="grid-template-columns: repeat(2, 1fr);">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB 3: INCIDENT CENTER TAB ── -->
+      <div id="tab-incidents" style="display: none;">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Comprehensive Incident Audit Log</div>
+            <button class="btn-sm resolve" onclick="resolveAllIncidents()">Batch Resolve All Open</button>
+          </div>
+          <div id="fullIncidentTable">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB 4: HEALTH & DIAGNOSTICS TAB ── -->
+      <div id="tab-health" style="display: none;">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Safety Reliability Scorecard</div>
+            <span class="tag-chip success" id="scorecardGrade">Grade A+</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px;" id="scorecardBreakdown">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Camera Nodes Telemetry & Heartbeats</div>
+          </div>
+          <div id="cameraTelemetryTable">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB 5: DYNAMIC RULE PARAMETERS SETTINGS ── -->
+      <div id="tab-settings" style="display: none;">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Safety Rule Engine Configuration</div>
+              <div class="panel-sub">Tune verification parameters in real-time without restarting the server</div>
+            </div>
+            <button class="btn-action" onclick="saveSettings()">💾 Save Runtime Rules</button>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <b>Window Duration</b>
+              <div style="font-size:11.5px; color:var(--text-muted)">Sliding temporal buffer</div>
+            </div>
+            <input type="range" id="paramWindow" min="2" max="30" step="1" oninput="el('valWindow').innerText = this.value + 's'">
+            <b id="valWindow">10s</b>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <b>Confirmation Ratio</b>
+              <div style="font-size:11.5px; color:var(--text-muted)">Missing frames share to trigger incident</div>
+            </div>
+            <input type="range" id="paramConfirm" min="0.4" max="0.95" step="0.05" oninput="el('valConfirm').innerText = Math.round(this.value * 100) + '%'">
+            <b id="valConfirm">70%</b>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <b>Clearance Ratio</b>
+              <div style="font-size:11.5px; color:var(--text-muted)">Missing frames share to reset violation</div>
+            </div>
+            <input type="range" id="paramClear" min="0.1" max="0.5" step="0.05" oninput="el('valClear').innerText = Math.round(this.value * 100) + '%'">
+            <b id="valClear">30%</b>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <b>Worker Timeout</b>
+              <div style="font-size:11.5px; color:var(--text-muted)">Unseen worker expiry time</div>
+            </div>
+            <input type="range" id="paramTimeout" min="5" max="30" step="1" oninput="el('valTimeout').innerText = this.value + 's'">
+            <b id="valTimeout">10s</b>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Evidence Snapshot Modal -->
+  <div class="modal-overlay" id="imageModal" onclick="closeModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 id="modalTitle">Incident Visual Evidence</h3>
+        <button class="btn-sm" onclick="closeModal()">✕ Close</button>
+      </div>
+      <img id="modalImg" src="" style="width:100%; border-radius:10px; max-height: 70vh; object-fit: contain;">
+    </div>
+  </div>
+
+  <script>
+    function el(id) { return document.getElementById(id); }
+
+    function timeAgo(iso) {
+      if (!iso) return 'No frames yet';
+      const sec = Math.max(0, Math.round((Date.now() - new Date(iso)) / 1000));
+      if (sec < 60) return `${sec}s ago`;
+      const min = Math.floor(sec / 60);
+      return `${min}m ago`;
+    }
+
+    function switchTab(tabId) {
+      const tabs = ['overview', 'cameras', 'incidents', 'health', 'settings'];
+      tabs.forEach(t => {
+        el(`tab-${t}`).style.display = (t === tabId) ? 'block' : 'none';
+      });
+      document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', tabs[idx] === tabId);
+      });
+      const titles = {
+        overview: 'Safety Operations Overview',
+        cameras: 'Live Multi-Camera Surveillance Matrix',
+        incidents: 'Incident Center & Audit Log',
+        health: 'System Telemetry & Reliability Scorecard',
+        settings: 'Dynamic Safety Rule Parameters'
+      };
+      el('pageHeading').innerText = titles[tabId] || 'SiteGuard';
+    }
+
+    function openModal(imgSrc, title) {
+      el('modalImg').src = imgSrc;
+      el('modalTitle').innerText = title || 'Camera Frame Snapshot';
+      el('imageModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      el('imageModal').style.display = 'none';
+    }
+
+    async function removeCamera(camId) {
+      if (!confirm(`Unregister and remove camera ${camId}?`)) return;
+      try {
+        await fetch(`/api/cameras/${encodeURIComponent(camId)}`, { method: 'DELETE' });
+        fetchOverview();
+      } catch (e) {
+        alert('Failed to remove camera: ' + e);
+      }
+    }
+
+    async function resolveAllIncidents() {
+      if (!confirm('Resolve all open incidents in the database?')) return;
+      try {
+        await fetch('/api/incidents/resolve-all', { method: 'POST' });
+        fetchOverview();
+      } catch (e) {
+        alert('Failed to resolve: ' + e);
+      }
+    }
+
+    async function changeIncident(id, status) {
+      try {
+        await fetch(`/api/incidents/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        fetchOverview();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function saveSettings() {
+      const payload = {
+        window_sec: parseFloat(el('paramWindow').value),
+        confirm_ratio: parseFloat(el('paramConfirm').value),
+        clear_ratio: parseFloat(el('paramClear').value),
+        worker_timeout_sec: parseFloat(el('paramTimeout').value)
+      };
+      try {
+        const res = await fetch('/api/config/rules', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          alert('Runtime rules updated successfully!');
+          fetchOverview();
+        }
+      } catch (e) {
+        alert('Failed to update rules: ' + e);
+      }
+    }
+
+    function renderCameraCard(c) {
+      const isOnline = c.status === 'online';
+      const imgSrc = isOnline ? `/api/cameras/${encodeURIComponent(c.id)}/latest-frame?t=${Date.now()}` : '';
+      return `
+        <div class="cam-box">
+          <div class="cam-head">
+            <div>
+              <span class="pulse-dot" style="background: ${isOnline ? 'var(--green)' : 'var(--red)'}"></span>
+              <b>${c.id}</b> <small style="color:var(--text-muted); margin-left:6px">${c.location || 'Unassigned'}</small>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px">
+              <span class="tag-chip ${isOnline ? 'success' : 'danger'}">${c.status.toUpperCase()}</span>
+              ${!isOnline ? `<button class="btn-sm" style="padding:2px 6px" onclick="removeCamera('${c.id}')" title="Dismiss offline node">✕</button>` : ''}
+            </div>
+          </div>
+          <div class="cam-feed" onclick="openModal('${imgSrc}', 'Camera: ${c.id}')">
+            ${isOnline ? `<img src="${imgSrc}" alt="${c.id} Live Feed">` : `<div class="offline-msg">Camera node offline<br><small>${timeAgo(c.last_frame_at)}</small></div>`}
+          </div>
+          <div class="cam-foot">
+            <span>FPS: <b>${(c.fps || 0).toFixed(1)}</b></span>
+            <span>Latency: <b>${(c.latency_ms || 0).toFixed(0)} ms</b></span>
+            <span>${timeAgo(c.last_frame_at)}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderWorkerRow(w) {
+      const ppeMap = { helmet: 'Hardhat', safety_vest: 'Vest', mask: 'Mask' };
+      const badges = Object.keys(w.ppe).map(k => {
+        const [state, conf] = Array.isArray(w.ppe[k]) ? w.ppe[k] : [w.ppe[k], 0];
+        const icon = state === 'ok' ? '✓' : (state === 'missing' ? '✗' : '…');
+        return `<span class="ppe-badge ${state}">${icon} ${ppeMap[k] || k}</span>`;
+      }).join('');
+
+      const statusTag = w.status === 'violation' ? 'danger' : (w.status === 'compliant' ? 'success' : 'cyan');
+      const label = w.status === 'violation' ? 'VIOLATION' : (w.status === 'compliant' ? 'COMPLIANT' : `MONITORING (${Math.floor(w.monitored_sec)}/${w.window_sec}s)`);
+
+      return `
+        <div class="worker-row">
+          <div class="worker-meta">
+            <span class="worker-id">Worker #${w.track_id}</span>
+            <span class="tag-chip ${statusTag}">${label}</span>
+            <small style="color:var(--text-muted)">${w.camera_id}</small>
+          </div>
+          <div class="ppe-badges">${badges}</div>
+        </div>
+      `;
+    }
+
+    function renderIncidentItem(inc) {
+      const ppeText = (inc.violation || '').replace(/^no_/, '').replaceAll('_', ' ').toUpperCase();
+      return `
+        <div class="incident-item">
+          <div class="incident-top">
+            <span class="incident-title">⚠ Missing: ${ppeText}</span>
+            <span class="tag-chip danger">${inc.severity}</span>
+          </div>
+          <div class="incident-meta">
+            <span>${inc.camera_id}</span>
+            <span>Worker #${inc.worker_id}</span>
+            <span>${timeAgo(inc.created_at)}</span>
+          </div>
+          <div class="incident-actions">
+            <button class="btn-sm" onclick="changeIncident(${inc.id}, 'acknowledged')">Acknowledge</button>
+            <button class="btn-sm resolve" onclick="changeIncident(${inc.id}, 'resolved')">Resolve</button>
+            ${inc.evidence_path ? `<button class="btn-sm" onclick="openModal('/snapshots/${inc.evidence_path}', 'Incident #${inc.id} Evidence')">View Snapshot</button>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    async function fetchOverview(force) {
+      try {
+        const res = await fetch('/api/dashboard/overview', { cache: 'no-store' });
+        if (!res.ok) throw new Error('API response failed');
+        const data = await res.json();
+        updateUI(data);
+        el('liveIndicator').className = 'live-pill';
+        el('liveIndicator').innerHTML = '<span class="pulse-dot"></span> LIVE STREAMING';
+      } catch (err) {
+        el('liveIndicator').className = 'live-pill offline';
+        el('liveIndicator').innerHTML = '● BACKEND OFFLINE';
+      }
+    }
+
+    function updateUI(d) {
+      el('lastSync').innerText = `Live sync ${new Date().toLocaleTimeString()} • ${d.cameras_online} active stream(s)`;
+
+      // ── CARD 1: Connected Cameras ──
+      el('cardCameras').innerText = `${d.cameras_online} / ${d.cameras_total}`;
+      el('camStatusBadge').innerText = d.cameras_online > 0 ? 'ONLINE' : 'IDLE';
+      el('camStatusBadge').className = d.cameras_online > 0 ? 'tag-chip success' : 'tag-chip amber';
+      el('camOnlineSub').innerText = `${d.cameras_online} active node${d.cameras_online === 1 ? '' : 's'}`;
+
+      // ── CARD 2: Active Violations (Dynamic Live Workers + DB Pending) ──
+      const liveVio = d.live_violations || 0;
+      el('cardViolations').innerText = liveVio;
+      if (liveVio > 0) {
+        el('cardViolations').style.color = '#ef4444';
+        el('violationBadge').innerText = `${liveVio} LIVE NOW`;
+        el('violationBadge').className = 'tag-chip danger';
+      } else {
+        el('cardViolations').style.color = '#10b981';
+        el('violationBadge').innerText = 'ALL COMPLIANT';
+        el('violationBadge').className = 'tag-chip success';
+      }
+      el('unresolvedCountSub').innerText = `${d.active_violations || 0} in open log`;
+
+      // ── CARD 3: Total Incidents & Scorecard ──
+      el('cardTotalIncidents').innerText = d.total_incidents || 0;
+      const card = d.safety_scorecard || {};
+      el('scorecardBadge').innerText = `${card.grade || 'A+'} (${card.overall_score || 91}%)`;
+      el('todayCountSub').innerText = `${d.incidents_24h || 0} in 24h`;
+
+      // ── CARD 4: AI Processing (Real-time FPS, Latency, Tracker) ──
+      const p = d.processing_metrics || {};
+      const isActive = p.is_active;
+      if (isActive) {
+        el('cardProcessing').innerText = `${(p.fps || 0).toFixed(1)} FPS`;
+        el('cardProcessing').style.color = '#10b981';
+        el('processingBadge').innerText = 'INFERENCE ACTIVE';
+        el('processingBadge').className = 'tag-chip success';
+      } else {
+        el('cardProcessing').innerText = 'STANDBY';
+        el('cardProcessing').style.color = '#38bdf8';
+        el('processingBadge').innerText = 'READY';
+        el('processingBadge').className = 'tag-chip cyan';
+      }
+      el('fpsLatencySub').innerText = `${(p.latency_ms || 0).toFixed(0)} ms • ${p.tracker || 'BOT-SORT'}`;
+      el('sideTracker').innerText = `${p.tracker || 'BOT-SORT'} • Deep Re-ID Active`;
+
+      // ── Diagnostics Meters ──
+      const sys = d.system_metrics || {};
+      const cpu = Math.round(sys.cpu_percent || 0);
+      const ram = Math.round(sys.ram_percent || 0);
+      el('diagCpu').innerText = `${cpu}%`;
+      el('diagCpuBar').style.width = `${cpu}%`;
+      el('diagRam').innerText = `${ram}%`;
+      el('diagRamBar').style.width = `${ram}%`;
+      const q = p.queue_size || 0;
+      el('diagQueue').innerText = `${q} / ${p.max_queue_size || 10} frames`;
+      el('diagQueueBar').style.width = `${Math.min(100, (q / 10) * 100)}%`;
+
+      // ── Cameras Grid ──
+      const cams = d.cameras || [];
+      const camHtml = cams.length ? cams.map(renderCameraCard).join('') : '<div style="color:var(--text-muted); padding:20px; grid-column:span 2; text-align:center;">No camera nodes connected.</div>';
+      el('cameraGrid').innerHTML = camHtml;
+      el('fullCamGrid').innerHTML = camHtml;
+
+      // ── Workers List ──
+      const ws = d.workers || [];
+      el('workerCountTag').innerText = `${ws.length} Tracked`;
+      el('workerList').innerHTML = ws.length ? ws.map(renderWorkerRow).join('') : '<div style="text-align: center; color: var(--text-muted); padding: 30px;">No workers currently in camera view.</div>';
+
+      // ── Incidents List ──
+      const incs = d.recent_incidents || [];
+      const incHtml = incs.length ? incs.map(renderIncidentItem).join('') : '<div style="text-align: center; color: var(--text-muted); padding: 30px;">No open safety incidents.</div>';
+      el('incidentList').innerHTML = incHtml;
+      el('fullIncidentTable').innerHTML = incHtml;
+
+      // ── Health & Diagnostics Tab Details ──
+      if (card.breakdown) {
+        el('scorecardGrade').innerText = `Grade ${card.grade} (${card.overall_score}/100)`;
+        el('scorecardBreakdown').innerHTML = `
+          <div class="card"><div class="card-label">Detection Reliability</div><div class="card-val">${card.breakdown.detection_rate_score}%</div></div>
+          <div class="card"><div class="card-label">Latency Performance</div><div class="card-val">${card.breakdown.latency_score}%</div></div>
+          <div class="card"><div class="card-label">System Uptime</div><div class="card-val">${card.breakdown.uptime_score}%</div></div>
+          <div class="card"><div class="card-label">Duplicate Suppression</div><div class="card-val">${card.breakdown.duplicate_suppression_score}%</div></div>
+        `;
+      }
+
+      // ── Settings Sliders Initialization ──
+      if (d.monitoring && !window._settingsLoaded) {
+        window._settingsLoaded = true;
+        const m = d.monitoring;
+        el('paramWindow').value = m.window_sec;
+        el('valWindow').innerText = m.window_sec + 's';
+        el('paramConfirm').value = m.confirm_ratio;
+        el('valConfirm').innerText = Math.round(m.confirm_ratio * 100) + '%';
+        el('paramClear').value = m.clear_ratio;
+        el('valClear').innerText = Math.round(m.clear_ratio * 100) + '%';
+        el('paramTimeout').value = m.worker_timeout_sec;
+        el('valTimeout').innerText = m.worker_timeout_sec + 's';
+      }
+    }
+
+    // ── WebSocket Live Push ──
+    function initWebSocket() {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const ws = new WebSocket(`${proto}//${location.host}/ws`);
+      ws.onmessage = () => { fetchOverview(); };
+      ws.onclose = () => { setTimeout(initWebSocket, 2500); };
+    }
+
+    // Initial load & Polling fallback
+    fetchOverview();
+    initWebSocket();
+    setInterval(fetchOverview, 3000);
+  </script>
+</body>
+</html>

@@ -246,6 +246,13 @@ def camera_summary(offline_after_sec: float) -> list[dict[str, Any]]:
     return cameras
 
 
+def delete_camera(camera_id: str) -> bool:
+    """Remove a camera entry from database."""
+    execute("DELETE FROM cameras WHERE id = ?", (camera_id,))
+    execute("DELETE FROM device_heartbeats WHERE device_id = ?", (camera_id,))
+    return True
+
+
 def get_incident_stats() -> dict[str, Any]:
     """Retrieve aggregated incident metrics."""
     total_inc = query("SELECT COUNT(*) as count FROM incidents")[0]["count"]

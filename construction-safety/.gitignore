@@ -28,6 +28,7 @@ received_frames/
 scratch/
 *.tmp
 *.temp
+Ultralytics/
 
 # IDE & Editor files
 .vscode/
