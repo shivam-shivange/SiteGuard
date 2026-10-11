@@ -199,6 +199,7 @@ A comprehensive benchmark of 15 seminal research papers justifying each componen
 ---
 
 ### 9. Presentation & Reporting Assets
+* **Consolidated 10-Slide Deck**: [`SiteGuard_Capstone_10Slides.pptx`](file:///d:/projects/MDM%20capstone/SiteGuard_Capstone_10Slides.pptx) / `C:\Users\HP\Downloads\SiteGuard_Capstone_10Slides.pptx`
 * **Full Capstone Slide Deck (16:9 Modern Theme)**: [`SiteGuard_Capstone_Presentation.pptx`](file:///d:/projects/MDM%20capstone/SiteGuard_Capstone_Presentation.pptx)
 * **Project Context Specification**: [`PROJECT_CONTEXT.md`](file:///d:/projects/MDM%20capstone/PROJECT_CONTEXT.md)
 * **Original Slide Deck**: [`AI-Based Construction Site Safety Monitoring System.pptx`](file:///d:/projects/MDM%20capstone/AI-Based%20Construction%20Site%20Safety%20Monitoring%20System.pptx)
