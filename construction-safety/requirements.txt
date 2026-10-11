@@ -5,3 +5,5 @@ numpy
 opencv-python
 ultralytics
 lap
+psutil
+pytest

@@ -21,6 +21,14 @@ const char* CAMERA_ID = "CAM-01";
 const char* CAMERA_NAME = "ESP32-CAM 01";
 const char* CAMERA_LOCATION = "Unassigned";
 
+// Target upload rate. The server needs ~50 ms per frame, so 5 FPS leaves
+// plenty of headroom; raise it on real hardware if WiFi keeps up.
+const unsigned long FRAME_INTERVAL_MS = 200;   // 5 FPS
+
+// Reused across frames so each upload skips a new TCP handshake.
+WiFiClient wifiClient;
+HTTPClient http;
+
 bool cameraReady = false;
 unsigned long nextCameraInitAttempt = 0;
 
@@ -91,10 +99,19 @@ bool setupCamera()
     // JPEG quality
     config.jpeg_quality = 12;
 
-    config.fb_count = 1;
-    config.fb_location = CAMERA_FB_IN_DRAM;
-    // The uploader intentionally runs slowly. Discard stale camera frames
-    // rather than allowing the producer to overflow its single frame buffer.
+    // Real AI-Thinker boards have 4 MB PSRAM: double-buffer there so the
+    // sensor captures the next frame while the current one uploads.
+    if (psramFound())
+    {
+        config.fb_count = 2;
+        config.fb_location = CAMERA_FB_IN_PSRAM;
+    }
+    else
+    {
+        config.fb_count = 1;
+        config.fb_location = CAMERA_FB_IN_DRAM;
+    }
+    // Always send the newest frame rather than a stale buffered one.
     config.grab_mode = CAMERA_GRAB_LATEST;
 
     esp_err_t result = esp_camera_init(&config);
@@ -181,9 +198,7 @@ void sendFrameToServer()
 
     if (WiFi.status() == WL_CONNECTED)
     {
-        HTTPClient http;
-
-        http.begin(SERVER_URL);
+        http.begin(wifiClient, SERVER_URL);
 
         http.addHeader("Content-Type", "image/jpeg");
         http.addHeader("X-Camera-ID", CAMERA_ID);
@@ -213,6 +228,7 @@ void sendFrameToServer()
 void setup()
 {
     Serial.begin(115200);
+    http.setReuse(true);   // HTTP keep-alive
 
     delay(1000);
 
@@ -261,9 +277,13 @@ void loop()
         }
     }
 
+    unsigned long startedAt = millis();
     sendFrameToServer();
 
-    // Don't hammer the server.
-    // Start with 1 frame every second.
-    delay(1000);
+    // Pace to FRAME_INTERVAL_MS, counting the time the upload already took.
+    unsigned long elapsed = millis() - startedAt;
+    if (elapsed < FRAME_INTERVAL_MS)
+    {
+        delay(FRAME_INTERVAL_MS - elapsed);
+    }
 }

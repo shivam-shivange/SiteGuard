@@ -1,26 +1,112 @@
-# Construction Safety Monitoring MVP
+# SiteGuard — AI-Based Construction Site Worker Safety Monitoring System
 
-Run the FastAPI service:
+SiteGuard is an optimized, real-time safety monitoring solution designed to run on resource-constrained hardware (e.g., AMD Ryzen 5 5625U CPU / integrated graphics) with wireless camera nodes (ESP32-CAM).
 
-```powershell
-cd construction-safety
-.\venv\Scripts\python -m uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+---
+
+## ⚡ Key Optimizations & Features
+
+1. **Modular FastAPI Architecture**: Decoupled ingestion, detection, safety rules, database, and real-time WebSockets into dedicated services under `app/`.
+2. **Asynchronous Frame Queue**: Built-in `asyncio.Queue` buffers incoming frames from cameras, preventing HTTP handler blocking and dropping stale frames during peak loads.
+3. **Optimized Object Detection & Tracking**:
+   - **Per-class confidence thresholds** (`Person`: 0.35, `NO-Hardhat`: 0.50, `NO-Safety Vest`: 0.45, etc.).
+   - **Tighter NMS IoU threshold** (0.40) to eliminate duplicate overlapping bounding boxes.
+   - **IoU Containment Association**: Replaces naive nearest-center heuristics with bounding box containment (`IoU >= 0.30`) to associate PPE items directly with workers.
+4. **SQLite WAL Mode & Pooling**: `PRAGMA journal_mode=WAL` with `NORMAL` sync and thread-local connection reuse for non-blocking concurrent database writes.
+5. **CPU Pre-Processing**: Dynamic CLAHE contrast enhancement for low-light camera feeds.
+6. **Telemetry & Device Health**: `/api/camera/heartbeat` endpoint for monitoring ESP32 RSSI, FPS, and free heap memory.
+7. **Validation & Benchmarking**: System benchmarking tools (`tools/benchmark_system.py`) and safety reliability scorecard (`tools/safety_scorecard.py`).
+
+---
+
+## 📁 Repository Structure
+
+```
+construction-safety/
+├── app/
+│   ├── config.py              # Central configuration & env-var overrides
+│   ├── database.py            # SQLite database manager with WAL mode
+│   ├── websocket_hub.py       # Typed WebSocket broadcast hub
+│   ├── main.py                # FastAPI entry point & routes
+│   ├── detection/
+│   │   ├── preprocessor.py    # CLAHE & image normalization
+│   │   ├── model_manager.py   # YOLO model loader & validator
+│   │   └── inference.py       # Per-camera ByteTrack & IoU containment
+│   ├── services/
+│   │   ├── safety_engine.py   # Temporal persistence & cooldown rules engine
+│   │   ├── event_manager.py   # DB recording & snapshot saving
+│   │   └── frame_queue.py     # Async frame queue & inference worker
+│   └── routes/
+│       ├── camera.py          # Frame upload & heartbeat endpoints
+│       ├── incidents.py       # REST endpoints for incidents & statistics
+│       └── system.py          # Health, metrics & hardware diagnostics
+├── tools/
+│   ├── benchmark_system.py    # Multi-camera load test & latency benchmark
+│   └── safety_scorecard.py    # Safety score generator
+├── tests/                     # pytest unit and integration tests
+├── server.py                  # Uvicorn server launcher
+├── dashboard.html             # Real-time WebSockets UI dashboard
+├── requirements.txt           # Python dependencies
+└── yolov8n_v1_best.pt         # Safety vision model weights
 ```
 
-For a fresh virtual environment, install dependencies with:
+---
 
-    .\venv\Scripts\python -m pip install -r requirements.txt
+## 🚀 Quick Start
 
-Open `http://127.0.0.1:8000/docs` for the API. The dashboard socket is `ws://127.0.0.1:8000/ws/dashboard`.
+### 1. Installation
 
-The ESP32 posts JPEG frames to `POST /api/camera/frame`. Add `X-Camera-ID`, `X-Camera-Name`, and `X-Camera-Location` headers to identify it. Frames are size- and image-validated before recording camera health. A camera becomes offline after 15 seconds without a frame.
+Activate your virtual environment and install requirements:
 
-The server deliberately reports `processing_unavailable` until a trained detector is connected—it never treats unprocessed footage as safe. A trusted inference worker posts a JPEG evidence frame to `POST /api/cameras/{camera_id}/detections` with an `X-Detections` header containing a JSON array such as `[{"worker_id":12,"violation":"no_helmet","confidence":0.91}]`. Incidents require 2 seconds of persistence and use a 30-second duplicate-suppression cooldown.
+```bash
+pip install -r requirements.txt
+```
 
-## Connected model
+### 2. Start Server
 
-`yolov8n_v1_best.pt` is loaded automatically at server startup. It detects
-`Hardhat`, `Mask`, `NO-Hardhat`, `NO-Mask`, `NO-Safety Vest`, `Person`,
-`Safety Cone`, `Safety Vest`, `machinery`, and `vehicle`. Missing hardhats,
-masks, and vests are converted into rule-based incidents after the configured
-persistence period. The live camera frame in the dashboard is annotated by YOLO.
+```bash
+python server.py
+```
+
+Or using uvicorn directly:
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Open dashboard in browser: `http://localhost:8000/`
+
+---
+
+## 🧪 Running Tests & Benchmarks
+
+### Run Unit & Integration Tests
+
+```bash
+pytest tests/
+```
+
+### Run System Benchmark
+
+Simulate 2 cameras streaming @ 5 FPS:
+
+```bash
+python -m tools.benchmark_system --cameras 2 --frames 50 --fps 5.0
+```
+
+### Generate Safety Scorecard
+
+```bash
+python -m tools.safety_scorecard
+```
+
+---
+
+## ⚙️ Configuration (Env Vars)
+
+All parameters can be tuned in `app/config.py` or set via environment variables prefixed with `SITEGUARD_`:
+
+- `SITEGUARD_TARGET_IMAGE_SIZE`: YOLO input resolution (default: `640`)
+- `SITEGUARD_PERSISTENCE_SECONDS`: Violation persistence threshold (default: `2.0` s)
+- `SITEGUARD_COOLDOWN_SECONDS`: Alert cooldown period (default: `30.0` s)
+- `SITEGUARD_ENABLE_CLAHE`: Enable contrast enhancement (default: `True`)

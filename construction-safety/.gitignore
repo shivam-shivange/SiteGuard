@@ -1,0 +1,36 @@
+# Environments & Virtual Envs
+venv/
+env/
+ENV/
+.venv/
+
+# Testing & Coverage
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Byte-compiled / Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local Data, Evidence & Snapshots
+data/
+received_frames/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.log
+
+# Scratch & Temporary
+scratch/
+*.tmp
+*.temp
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*~
