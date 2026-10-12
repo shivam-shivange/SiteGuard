@@ -15,9 +15,10 @@ EVIDENCE_DIR = DATA_DIR / "evidence"
 LATEST_DIR = DATA_DIR / "latest"
 MODEL_PATH = BASE_DIR / "yolov8n_v1_best.pt"
 ONNX_MODEL_PATH = BASE_DIR / "yolov8n_v1_best.onnx"
+VIDEOS_DIR = DATA_DIR / "videos"
 DB_PATH = DATA_DIR / "safety.db"
 
-for _d in (DATA_DIR, EVIDENCE_DIR, LATEST_DIR):
+for _d in (DATA_DIR, EVIDENCE_DIR, LATEST_DIR, VIDEOS_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 
 # Keep Ultralytics config inside the project tree

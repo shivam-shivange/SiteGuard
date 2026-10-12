@@ -181,6 +181,14 @@
       transition: all 0.2s;
     }
     .btn-action:hover { background: #203554; border-color: #38bdf8; }
+    .btn-action.primary {
+      background: linear-gradient(135deg, #0284c7, #0ea5e9);
+      color: #fff;
+      border-color: #38bdf8;
+    }
+    .btn-action.primary:hover {
+      background: linear-gradient(135deg, #0369a1, #0284c7);
+    }
 
     /* ── Metric Cards ── */
     .metric-grid {
@@ -385,10 +393,49 @@
     .btn-sm:hover { background: #334155; }
     .btn-sm.resolve { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; }
     .btn-sm.resolve:hover { background: rgba(16, 185, 129, 0.3); }
+    .btn-sm.danger { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; }
 
     /* ── Progress & Gauge Bars ── */
     .bar-wrap { width: 100%; height: 6px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-top: 8px; }
     .bar-fill { height: 100%; background: var(--cyan); transition: width 0.4s; }
+
+    /* ── Video Simulation Dropzone & Controls ── */
+    .dropzone {
+      border: 2px dashed rgba(14, 165, 233, 0.4);
+      background: rgba(14, 23, 38, 0.4);
+      border-radius: 12px;
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 18px;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      background: rgba(14, 165, 233, 0.08);
+      border-color: var(--cyan);
+    }
+    .dropzone-icon { font-size: 36px; margin-bottom: 8px; }
+
+    .stream-control-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 20px;
+      background: rgba(14, 23, 38, 0.6);
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+    }
+    .input-field {
+      width: 100%;
+      background: #091220;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
 
     /* ── Modal ── */
     .modal-overlay {
@@ -431,6 +478,7 @@
     @media (max-width: 1100px) {
       .metric-grid { grid-template-columns: repeat(2, 1fr); }
       .dashboard-layout { grid-template-columns: 1fr; }
+      .stream-control-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 768px) {
       .app { flex-direction: column; }
@@ -454,6 +502,9 @@
         </button>
         <button class="nav-btn" onclick="switchTab('cameras')">
           <span class="nav-icon">▣</span> Live Feeds
+        </button>
+        <button class="nav-btn" onclick="switchTab('videostream')">
+          <span class="nav-icon">🎬</span> Video Simulation
         </button>
         <button class="nav-btn" onclick="switchTab('incidents')">
           <span class="nav-icon">⚠</span> Incident Center
@@ -483,6 +534,9 @@
           <div class="live-pill" id="liveIndicator">
             <span class="pulse-dot"></span> LIVE STREAMING
           </div>
+          <button class="btn-action primary" onclick="switchTab('videostream')">
+            🎬 Upload Video Test
+          </button>
           <button class="btn-action" onclick="fetchOverview(true)">
             ↻ Refresh
           </button>
@@ -553,9 +607,12 @@
               <div class="panel-header">
                 <div>
                   <div class="panel-title">Live Video Feeds</div>
-                  <div class="panel-sub">Wireless ESP32-CAM nodes & local webcams</div>
+                  <div class="panel-sub">Wireless ESP32-CAM nodes, webcams & looped video tests</div>
                 </div>
-                <button class="btn-sm" onclick="switchTab('cameras')">Expand All →</button>
+                <div style="display:flex; gap:8px">
+                  <button class="btn-sm" onclick="switchTab('videostream')">+ Video Stream</button>
+                  <button class="btn-sm" onclick="switchTab('cameras')">Expand All →</button>
+                </div>
               </div>
               <div class="cam-grid" id="cameraGrid">
                 <div class="cam-box"><div class="cam-feed"><div class="offline-msg">No cameras streaming.</div></div></div>
@@ -627,15 +684,89 @@
       <div id="tab-cameras" style="display: none;">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">Full Camera Surveillance Matrix</div>
-            <span class="panel-sub">Click any camera to view full resolution stream</span>
+            <div>
+              <div class="panel-title">Full Camera Surveillance Matrix</div>
+              <div class="panel-sub">Click any camera to view full resolution stream</div>
+            </div>
+            <button class="btn-action primary" onclick="switchTab('videostream')">
+              + Stream Looped Video
+            </button>
           </div>
           <div class="cam-grid" id="fullCamGrid" style="grid-template-columns: repeat(2, 1fr);">
           </div>
         </div>
       </div>
 
-      <!-- ── TAB 3: INCIDENT CENTER TAB ── -->
+      <!-- ── TAB 3: VIDEO SIMULATION & LOOPING TEST (NEW TAB) ── -->
+      <div id="tab-videostream" style="display: none;">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">🎬 Construction Site Video Simulation & Looped Testing</div>
+              <div class="panel-sub">Upload an authentic construction site video file and run it continuously through the YOLO + BoT-SORT pipeline as a virtual camera feed.</div>
+            </div>
+            <span class="tag-chip cyan" id="streamStatusBadge">IDLE</span>
+          </div>
+
+          <!-- Video Upload Dropzone -->
+          <div class="dropzone" id="videoDropzone" onclick="el('videoFileInput').click()">
+            <div class="dropzone-icon">📁</div>
+            <h3 style="font-size:16px; margin-bottom:4px">Click or Drag & Drop Construction Video File</h3>
+            <p style="font-size:12px; color:var(--text-muted)">Supported formats: MP4, AVI, MOV, MKV, WEBM (e.g., worker safety footage)</p>
+            <input type="file" id="videoFileInput" accept=".mp4,.avi,.mov,.mkv,.webm" style="display:none" onchange="handleVideoFileSelect(event)">
+            <div id="uploadProgressText" style="margin-top:10px; font-weight:700; color:var(--cyan); display:none">Uploading video...</div>
+          </div>
+
+          <!-- Stream Configuration & Launcher -->
+          <div class="stream-control-grid">
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--text-muted)">VIDEO SOURCE</label>
+              <select id="selectedVideoSelect" class="input-field" style="margin-top:4px">
+                <option value="">No videos uploaded yet</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--text-muted)">VIRTUAL CAMERA ID</label>
+              <input id="streamCamId" class="input-field" value="CAM-VIDEO" style="margin-top:4px">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--text-muted)">
+                STREAM PACING: <span id="valFpsDisplay" style="color:var(--cyan)">5.0 FPS</span>
+              </label>
+              <input type="range" id="streamFpsRange" min="1" max="25" step="1" value="5" style="margin-top:8px" oninput="el('valFpsDisplay').innerText = this.value + '.0 FPS'">
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; margin-top:14px">
+              <label style="font-size:12px; display:flex; align-items:center; gap:6px; cursor:pointer">
+                <input type="checkbox" id="streamLoopCheck" checked style="accent-color:var(--cyan)"> Loop Continuously
+              </label>
+              <button class="btn-action primary" onclick="startSelectedStream()">
+                ▶ Start Loop Stream
+              </button>
+              <button class="btn-action" style="border-color:#ef4444; color:#fca5a5" onclick="stopCurrentStream()">
+                ⏹ Stop Stream
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Streams Monitor -->
+          <div style="margin-top:16px" id="activeStreamsCard">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Uploaded Video Files Table -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Uploaded Video Library</div>
+            <button class="btn-sm" onclick="fetchVideoList()">↻ Refresh Library</button>
+          </div>
+          <div id="videoLibraryTable">
+            <div style="color:var(--text-muted); padding:20px; text-align:center">Loading uploaded video list...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB 4: INCIDENT CENTER TAB ── -->
       <div id="tab-incidents" style="display: none;">
         <div class="panel">
           <div class="panel-header">
@@ -648,7 +779,7 @@
         </div>
       </div>
 
-      <!-- ── TAB 4: HEALTH & DIAGNOSTICS TAB ── -->
+      <!-- ── TAB 5: HEALTH & DIAGNOSTICS TAB ── -->
       <div id="tab-health" style="display: none;">
         <div class="panel">
           <div class="panel-header">
@@ -670,7 +801,7 @@
         </div>
       </div>
 
-      <!-- ── TAB 5: DYNAMIC RULE PARAMETERS SETTINGS ── -->
+      <!-- ── TAB 6: DYNAMIC RULE PARAMETERS SETTINGS ── -->
       <div id="tab-settings" style="display: none;">
         <div class="panel">
           <div class="panel-header">
@@ -744,9 +875,10 @@
     }
 
     function switchTab(tabId) {
-      const tabs = ['overview', 'cameras', 'incidents', 'health', 'settings'];
+      const tabs = ['overview', 'cameras', 'videostream', 'incidents', 'health', 'settings'];
       tabs.forEach(t => {
-        el(`tab-${t}`).style.display = (t === tabId) ? 'block' : 'none';
+        const dom = el(`tab-${t}`);
+        if (dom) dom.style.display = (t === tabId) ? 'block' : 'none';
       });
       document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
         btn.classList.toggle('active', tabs[idx] === tabId);
@@ -754,11 +886,17 @@
       const titles = {
         overview: 'Safety Operations Overview',
         cameras: 'Live Multi-Camera Surveillance Matrix',
+        videostream: 'Construction Site Video Simulation & Testing',
         incidents: 'Incident Center & Audit Log',
         health: 'System Telemetry & Reliability Scorecard',
         settings: 'Dynamic Safety Rule Parameters'
       };
       el('pageHeading').innerText = titles[tabId] || 'SiteGuard';
+
+      if (tabId === 'videostream') {
+        fetchVideoList();
+        fetchStreamStatus();
+      }
     }
 
     function openModal(imgSrc, title) {
@@ -824,6 +962,197 @@
       } catch (e) {
         alert('Failed to update rules: ' + e);
       }
+    }
+
+    // ── VIDEO STREAM SIMULATION LOGIC ──
+    async function fetchVideoList() {
+      try {
+        const res = await fetch('/api/video/list');
+        const data = await res.json();
+        const select = el('selectedVideoSelect');
+        const list = data.videos || [];
+        select.innerHTML = list.length ? list.map(v => `<option value="${v.filename}">${v.filename} (${v.size_mb} MB${v.duration_sec ? ' · ' + v.duration_sec + 's' : ''})</option>`).join('') : '<option value="">No videos uploaded yet</option>';
+
+        const tableHtml = list.length ? `
+          <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead>
+              <tr style="text-align:left; color:var(--text-muted); border-bottom:1px solid var(--card-border);">
+                <th style="padding:10px">Filename</th>
+                <th style="padding:10px">Size</th>
+                <th style="padding:10px">Resolution</th>
+                <th style="padding:10px">Native FPS</th>
+                <th style="padding:10px">Duration</th>
+                <th style="padding:10px; text-align:right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map(v => `
+                <tr style="border-bottom:1px solid rgba(51,65,85,0.2)">
+                  <td style="padding:12px 10px; font-weight:700">🎬 ${v.filename}</td>
+                  <td style="padding:10px">${v.size_mb} MB</td>
+                  <td style="padding:10px">${v.width && v.height ? v.width + '×' + v.height : '—'}</td>
+                  <td style="padding:10px">${v.fps ? v.fps + ' FPS' : '—'}</td>
+                  <td style="padding:10px">${v.duration_sec ? v.duration_sec + 's' : '—'}</td>
+                  <td style="padding:10px; text-align:right">
+                    <button class="btn-sm resolve" onclick="startStreamSpecific('${v.filename}')">▶ Run Loop</button>
+                    <button class="btn-sm danger" onclick="deleteVideoFile('${v.filename}')">🗑 Delete</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        ` : '<div style="color:var(--text-muted); text-align:center; padding:30px;">No uploaded videos. Drag and drop a construction site video above.</div>';
+
+        el('videoLibraryTable').innerHTML = tableHtml;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function handleVideoFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const pText = el('uploadProgressText');
+      pText.style.display = 'block';
+      pText.innerText = `Uploading ${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)...`;
+
+      try {
+        const res = await fetch('/api/video/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok) {
+          pText.innerText = `✔ ${data.filename} uploaded successfully! Ready to stream.`;
+          fetchVideoList();
+        } else {
+          pText.innerText = `✕ Error: ${data.detail || 'Upload failed'}`;
+        }
+      } catch (err) {
+        pText.innerText = `✕ Upload failed: ${err.message}`;
+      }
+    }
+
+    async function startSelectedStream() {
+      const filename = el('selectedVideoSelect').value;
+      if (!filename) {
+        alert('Please select or upload a video file first.');
+        return;
+      }
+      const camId = el('streamCamId').value.trim() || 'CAM-VIDEO';
+      const fps = parseFloat(el('streamFpsRange').value) || 5.0;
+      const loop = el('streamLoopCheck').checked;
+
+      try {
+        const res = await fetch('/api/video/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            video_filename: filename,
+            camera_id: camId,
+            target_fps: fps,
+            loop: loop
+          })
+        });
+        if (res.ok) {
+          fetchStreamStatus();
+          fetchOverview();
+        } else {
+          const err = await res.json();
+          alert('Failed to start stream: ' + (err.detail || 'Unknown error'));
+        }
+      } catch (e) {
+        alert('Error starting stream: ' + e);
+      }
+    }
+
+    async function startStreamSpecific(filename) {
+      el('selectedVideoSelect').value = filename;
+      await startSelectedStream();
+    }
+
+    async function stopCurrentStream() {
+      const camId = el('streamCamId').value.trim() || 'CAM-VIDEO';
+      try {
+        await fetch('/api/video/stop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ camera_id: camId })
+        });
+        fetchStreamStatus();
+        fetchOverview();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function deleteVideoFile(filename) {
+      if (!confirm(`Delete video file '${filename}'?`)) return;
+      try {
+        await fetch(`/api/video/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+        fetchVideoList();
+        fetchStreamStatus();
+      } catch (e) {
+        alert('Failed to delete: ' + e);
+      }
+    }
+
+    async function fetchStreamStatus() {
+      try {
+        const res = await fetch('/api/video/status');
+        const data = await res.json();
+        const active = data.active_streams || [];
+        const badge = el('streamStatusBadge');
+        if (active.length > 0) {
+          badge.innerText = `STREAMING (${active.length} ACTIVE)`;
+          badge.className = 'tag-chip success';
+
+          el('activeStreamsCard').innerHTML = active.map(s => `
+            <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <span class="pulse-dot"></span>
+                  <b style="color:#6ee7b7">Active Virtual Camera: ${s.camera_id}</b>
+                  <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Playing: <b>${s.video}</b> in continuous loop · Speed: <b>${s.target_fps} FPS</b> · Completed Loops: <b>${s.loops_completed}</b></div>
+                </div>
+                <button class="btn-sm danger" onclick="stopCurrentStream()">⏹ Stop Stream</button>
+              </div>
+              <div style="margin-top:10px; font-size:11px; font-family:var(--font-mono); color:var(--text-muted); display:flex; justify-content:space-between">
+                <span>Frame ${s.current_frame} / ${s.total_frames || '—'}</span>
+                <span>Uptime: ${s.uptime_sec}s</span>
+              </div>
+              <div class="bar-wrap">
+                <div class="bar-fill" style="width: ${s.total_frames ? (s.current_frame / s.total_frames * 100) : 100}%; background:var(--green)"></div>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          badge.innerText = 'IDLE';
+          badge.className = 'tag-chip cyan';
+          el('activeStreamsCard').innerHTML = '';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Drag and Drop listeners
+    const dropzone = el('videoDropzone');
+    if (dropzone) {
+      dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+      dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('dragover'); });
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+          el('videoFileInput').files = e.dataTransfer.files;
+          handleVideoFileSelect({ target: { files: e.dataTransfer.files } });
+        }
+      });
     }
 
     function renderCameraCard(c) {
@@ -1025,6 +1354,7 @@
     fetchOverview();
     initWebSocket();
     setInterval(fetchOverview, 3000);
+    setInterval(fetchStreamStatus, 2500);
   </script>
 </body>
 </html>

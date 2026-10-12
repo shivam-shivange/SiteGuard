@@ -23,7 +23,9 @@ from app.routes.dashboard import build_overview
 from app.routes.dashboard import router as dashboard_router
 from app.routes.incidents import router as incidents_router
 from app.routes.system import router as system_router
+from app.routes.video_stream import router as video_stream_router
 from app.services.frame_queue import frame_queue
+from app.services.video_streamer import video_streamer
 from app.websocket_hub import ws_hub
 
 # Configure logger
@@ -50,6 +52,8 @@ async def lifespan(app: FastAPI):
 
     logger.info("Stopping frame processing queue worker...")
     await frame_queue.stop_worker()
+    logger.info("Stopping active video streams...")
+    await video_streamer.stop_all()
     logger.info("SiteGuard application shutdown complete.")
 
 
@@ -75,6 +79,7 @@ app.include_router(camera_router)
 app.include_router(incidents_router)
 app.include_router(system_router)
 app.include_router(dashboard_router)
+app.include_router(video_stream_router)
 
 # Mount snapshots directory
 app.mount("/snapshots", StaticFiles(directory=SNAPSHOT_DIR), name="snapshots")
