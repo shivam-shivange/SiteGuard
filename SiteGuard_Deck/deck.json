@@ -1,0 +1,23 @@
+{
+  "v": 4,
+  "createdOnFiles": {"v": 1, "at": "2026-10-11T10:00:00Z"},
+  "lists": "css",
+  "title": "SiteGuard Capstone",
+  "cover": "cover",
+  "order": ["cover", "problem", "objectives", "features", "architecture", "hardware", "firmware", "preprocessing", "detection", "tracking", "association", "engine", "incidents", "parameters", "scorecard", "literature", "gaps", "iot", "deployment", "summary"],
+  "sections": {
+    "s1": {"description": "Why construction sites need automated PPE monitoring", "start": "cover"},
+    "s2": {"description": "What SiteGuard does and how data flows end to end", "start": "features"},
+    "s3": {"description": "The ESP32-CAM edge node and its firmware", "start": "hardware"},
+    "s4": {"description": "The computer vision pipeline: preprocessing, detection, tracking, association", "start": "preprocessing"},
+    "s5": {"description": "Turning detections into trustworthy incidents", "start": "engine"},
+    "s6": {"description": "Parameters, scoring, benchmarking and research backing", "start": "parameters"},
+    "s7": {"description": "Gaps, hardware expansion and deployment paths", "start": "gaps"}
+  },
+  "faces": {
+    "oswald": {"family": "Oswald", "href": "https://fonts.googleapis.com/css2?family=Oswald:wght@400..700&display=swap"},
+    "ibm-plex-sans": {"family": "IBM Plex Sans", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"}
+  },
+  "designSystems": []
+}

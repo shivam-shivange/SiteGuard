@@ -1,0 +1,34 @@
+<section id="association" style="background:#15171C;color:#F2EEE6;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518;letter-spacing:4px;text-transform:uppercase">11 · PPE-to-worker association</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#F2EEE6">Gear belongs to the worker whose box contains it</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="background:#F5C518;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;font-weight:600;color:#15171C">containment = area(PPE ∩ Person) / area(PPE)</p>
+<p style="font-size:24px;color:#2B2410">Assigned when containment is 0.50 or more</p>
+</div>
+<ul style="font-size:32px;line-height:1.5;color:#F2EEE6;display:flex;flex-direction:column;gap:20px">
+<li>Two workers side by side each get only their own gear</li>
+<li>Loose PPE on the floor or scaffold matches no one and is dropped</li>
+<li>Hardhat and NO-Hardhat on one worker: higher confidence wins</li>
+<li>Result is a per-worker checklist bound to the track ID</li>
+</ul>
+</div>
+<div style="width:640px;background:#0E0F13;border:2px solid #2E333D;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:6px;font-family:'JetBrains Mono', 'Courier New', monospace">
+<p style="font-size:24px;color:#8A93A3"># worker 07, one frame</p>
+<p style="font-size:24px;color:#F2EEE6">{</p>
+<p style="font-size:24px;color:#F2EEE6">  "helmet": <span style="color:#F5C518">("ok", 0.82)</span>,</p>
+<p style="font-size:24px;color:#F2EEE6">  "safety_vest": <span style="color:#FF8A3D">("missing", 0.74)</span>,</p>
+<p style="font-size:24px;color:#F2EEE6">  "mask": <span style="color:#F5C518">("ok", 0.61)</span></p>
+<p style="font-size:24px;color:#F2EEE6">}</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#B8BEC9">SITEGUARD</p>
+<p style="font-size:24px;color:#B8BEC9">11</p>
+</div>
+<aside>The detector finds people and PPE separately, so we must decide which hardhat belongs to which worker. Following Fang et al., we measure containment: what fraction of the PPE box lies inside the person box. Using the PPE area as the denominator, not plain IoU, matters because a hardhat is tiny relative to a body. At 50 percent or more, the item belongs to that worker. Gear lying on the ground matches nobody and is ignored. If a worker has both a hardhat and a no-hardhat detection, the more confident one wins. The output is a per-worker checklist like the one on the right, keyed to the track ID, which feeds the safety engine. The values shown are an illustrative example.</aside>
+</section>

@@ -1,0 +1,27 @@
+<section id="scorecard" style="background:#15171C;color:#F2EEE6;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518;letter-spacing:4px;text-transform:uppercase">15 · Evaluation</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#F2EEE6">The reliability scorecard grades SiteGuard A+</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:64px">
+<div style="width:520px;background:#F5C518;border-radius:20px;padding:48px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2B2410">OVERALL SCORE</p>
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:160px;font-weight:700;line-height:1;color:#15171C">91.25</p>
+<p style="font-size:32px;font-weight:600;color:#15171C">Grade A+ (90 or above)</p>
+<p style="font-size:24px;line-height:1.4;color:#2B2410">0.35·det + 0.25·lat + 0.20·up + 0.20·dup</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:28px">Detection reliability · 35%</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F5C518">85.0</p></div><div style="height:20px;background:#2E333D;border-radius:10px;display:flex"><div style="width:85%;background:#F5C518;border-radius:10px"></div></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:28px">Latency · 25% · avg inference 48.2 ms</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F5C518">90.0</p></div><div style="height:20px;background:#2E333D;border-radius:10px;display:flex"><div style="width:90%;background:#F5C518;border-radius:10px"></div></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:28px">Uptime · 20% · heartbeat continuity</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F5C518">95.0</p></div><div style="height:20px;background:#2E333D;border-radius:10px;display:flex"><div style="width:95%;background:#F5C518;border-radius:10px"></div></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:28px">Duplicate suppression · 20%</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F5C518">100.0</p></div><div style="height:20px;background:#2E333D;border-radius:10px;display:flex"><div style="width:100%;background:#F5C518;border-radius:10px"></div></div></div>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9;border-top:2px solid #2E333D;padding:20px 0px 0px 0px">Benchmark: 2–4 simulated cameras at 5 FPS, measuring end-to-end latency, queue wait, processing FPS and frame-drop rate.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#B8BEC9">SITEGUARD</p>
+<p style="font-size:24px;color:#B8BEC9">15</p>
+</div>
+<aside>To evaluate the system as a whole rather than just the model, tools/safety_scorecard.py combines four sub-scores into a 0 to 100 reliability score. Detection reliability is weighted highest at 35 percent, at 85. Latency scores 90, with average inference of 48 milliseconds on the laptop CPU. Uptime, from camera heartbeat continuity, is 95. Duplicate suppression is 100, because the episode logic never produced a duplicate incident row. The weighted total is 91.25, grade A plus. Separately, tools/benchmark_system.py load-tests the server with two to four simulated cameras at 5 frames per second and reports latency, queue wait, throughput and dropped frames.</aside>
+</section>

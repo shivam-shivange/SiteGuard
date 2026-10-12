@@ -1,0 +1,18 @@
+<section id="deployment" style="background:#15171C;color:#F2EEE6;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518;letter-spacing:4px;text-transform:uppercase">19 · Deployment</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#F2EEE6">One codebase scales from laptop to multi-site</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:24px">
+<div style="flex:1;background:#F5C518;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#2B2410">NOW</p><h3 style="font-size:32px;font-weight:600;color:#15171C">Local host</h3><p style="font-size:24px;line-height:1.4;color:#2B2410">ESP32-CAM to PC running FastAPI, YOLOv8n and SQLite.</p><div style="flex:1"></div><p style="font-size:24px;font-weight:600;color:#15171C">Zero cloud cost, no internet needed</p></div>
+<div style="flex:1;background:#1F232B;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">OPTION A</p><h3 style="font-size:32px;font-weight:600">Edge gateway</h3><p style="font-size:24px;line-height:1.4;color:#B8BEC9">Jetson Orin Nano with TensorRT FP16/INT8.</p><div style="flex:1"></div><p style="font-size:24px;font-weight:600;color:#F2EEE6">Fanless, 8+ RTSP streams</p></div>
+<div style="flex:1;background:#1F232B;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">OPTION B</p><h3 style="font-size:32px;font-weight:600">Hybrid cloud</h3><p style="font-size:24px;line-height:1.4;color:#B8BEC9">AWS ECS with Triton; evidence archived on S3.</p><div style="flex:1"></div><p style="font-size:24px;font-weight:600;color:#F2EEE6">Oversight across many sites</p></div>
+<div style="flex:1;background:#1F232B;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">OPTION C</p><h3 style="font-size:32px;font-weight:600">Docker suite</h3><p style="font-size:24px;line-height:1.4;color:#B8BEC9">FastAPI, nginx, Redis and Postgres in Compose.</p><div style="flex:1"></div><p style="font-size:24px;font-weight:600;color:#F2EEE6">One-command site install</p></div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#B8BEC9">SITEGUARD</p>
+<p style="font-size:24px;color:#B8BEC9">19</p>
+</div>
+<aside>Today SiteGuard runs entirely on a local PC: no cloud bill, no internet dependency, low latency. Because the server is a standard FastAPI app with a pluggable model runtime, it can move up three paths without a rewrite. A Jetson Orin Nano gateway with TensorRT gives a rugged on-site box for eight or more cameras. A hybrid cloud deployment on AWS with Triton gives head-office oversight across many sites. Or a Docker Compose bundle with nginx, Redis and Postgres gives a one-command install for a site office.</aside>
+</section>

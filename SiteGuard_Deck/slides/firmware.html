@@ -1,0 +1,49 @@
+<section id="firmware" style="background:#15171C;color:#F2EEE6;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518;letter-spacing:4px;text-transform:uppercase">07 · Firmware</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#F2EEE6">The node ships its newest frame every 200 ms</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:48px">
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:24px">
+<div style="background:#1F232B;border-left:6px solid #F5C518;border-radius:12px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#F5C518">5 FPS</p>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Loop paced to 200 ms, counting upload time</p>
+</div>
+<div style="background:#1F232B;border-left:6px solid #F5C518;border-radius:12px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#F5C518">QVGA</p>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">320×240 JPEG at quality 12</p>
+</div>
+<div style="background:#1F232B;border-left:6px solid #F5C518;border-radius:12px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#F5C518">2 buffers</p>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">In PSRAM with grab-latest: capture while uploading</p>
+</div>
+<div style="background:#1F232B;border-left:6px solid #F5C518;border-radius:12px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#F5C518">Keep-alive</p>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Reused HTTP socket skips a TCP handshake per frame</p>
+</div>
+</div>
+<div style="width:760px;display:flex;flex-direction:column;gap:24px">
+<div style="flex:1;background:#0E0F13;border:2px solid #2E333D;border-radius:16px;padding:36px;display:flex;flex-direction:column;gap:6px;font-family:'JetBrains Mono', 'Courier New', monospace">
+<p style="font-size:24px;color:#F5C518">POST /api/camera/frame</p>
+<p style="font-size:24px;color:#B8BEC9">Content-Type: image/jpeg</p>
+<p style="font-size:24px;color:#B8BEC9">X-Camera-ID: CAM-01</p>
+<p style="font-size:24px;color:#B8BEC9">X-Camera-Name: ESP32-CAM 01</p>
+<p style="font-size:24px;color:#B8BEC9">X-Camera-Location: Unassigned</p>
+<p style="font-size:24px;color:#8A93A3">&lt;raw JPEG bytes&gt;</p>
+<div style="flex:1"></div>
+<p style="font-size:24px;color:#FF8A3D">← 200 {"status": "success",</p>
+<p style="font-size:24px;color:#FF8A3D">       "camera_id": "CAM-01"}</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:center">
+<x-icon name="Wrench" style="color:#F5C518;width:36px;height:36px"></x-icon>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Self-healing: camera init retries every 2 s; Wi-Fi reconnects on drop.</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#B8BEC9">SITEGUARD</p>
+<p style="font-size:24px;color:#B8BEC9">07</p>
+</div>
+<aside>The firmware in velxio.cpp is deliberately simple and robust. It captures a QVGA JPEG, posts it to the FastAPI server, and paces itself to 5 frames per second, subtracting the time the upload took. Two frame buffers in PSRAM with grab-latest mode mean the sensor captures the next frame while the current one uploads, and we always send the freshest image rather than a stale one. HTTP keep-alive reuses the TCP connection. The request carries the camera ID, name and location as headers, so adding a camera needs no server change. If the camera or Wi-Fi drops, the loop retries instead of crashing. We tested it in the Velxio ESP32 simulator as well as on hardware.</aside>
+</section>

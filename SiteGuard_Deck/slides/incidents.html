@@ -1,0 +1,31 @@
+<section id="incidents" style="background:#15171C;color:#F2EEE6;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518;letter-spacing:4px;text-transform:uppercase">13 · Incidents &amp; live alerts</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#F2EEE6">A confirmed violation becomes evidence and an alert</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center">
+<div style="flex:1;background:#1F232B;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><x-icon name="Search" style="color:#F5C518;width:40px;height:40px"></x-icon><h3 style="font-size:32px;font-weight:600">Snapshot</h3><p style="font-size:24px;color:#B8BEC9">Annotated JPEG saved</p></div>
+<x-icon name="PaperPlane" style="color:#8A93A3;width:40px;height:40px"></x-icon>
+<div style="flex:1;background:#1F232B;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><x-icon name="Database" style="color:#F5C518;width:40px;height:40px"></x-icon><h3 style="font-size:32px;font-weight:600">SQLite WAL</h3><p style="font-size:24px;color:#B8BEC9">Non-blocking writes</p></div>
+<x-icon name="PaperPlane" style="color:#8A93A3;width:40px;height:40px"></x-icon>
+<div style="flex:1;background:#1F232B;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><x-icon name="Lightning" style="color:#F5C518;width:40px;height:40px"></x-icon><h3 style="font-size:32px;font-weight:600">WebSocket</h3><p style="font-size:24px;color:#B8BEC9">Broadcast to all clients</p></div>
+<x-icon name="PaperPlane" style="color:#8A93A3;width:40px;height:40px"></x-icon>
+<div style="flex:1;background:#2A2410;border:2px solid #F5C518;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><x-icon name="Activity" style="color:#F5C518;width:40px;height:40px"></x-icon><h3 style="font-size:32px;font-weight:600">Dashboard</h3><p style="font-size:24px;color:#D9CFA8">Alert card appears</p></div>
+</div>
+<div style="flex:1;background:#0E0F13;border:2px solid #2E333D;border-radius:16px;padding:32px 40px;display:grid;grid-template-columns:1fr 1fr;gap:4px 48px;font-family:'JetBrains Mono', 'Courier New', monospace">
+<p style="font-size:24px;color:#F5C518">"event_type": "INCIDENT_ALERT"</p>
+<p style="font-size:24px;color:#B8BEC9">"severity": "high"</p>
+<p style="font-size:24px;color:#B8BEC9">"camera_id": "CAM-01"</p>
+<p style="font-size:24px;color:#B8BEC9">"track_id": 7</p>
+<p style="font-size:24px;color:#B8BEC9">"violation_type": "no_helmet"</p>
+<p style="font-size:24px;color:#B8BEC9">"confidence": 0.81</p>
+<p style="font-size:24px;color:#B8BEC9">"snapshot_filename": "CAM-01_…jpg"</p>
+<p style="font-size:24px;color:#8A93A3">Severity: helmet, vest = high · mask = medium</p>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#B8BEC9">SITEGUARD</p>
+<p style="font-size:24px;color:#B8BEC9">13</p>
+</div>
+<aside>When the engine confirms a violation, the event manager does three things. It saves the annotated frame as a JPEG, so every incident has photo evidence. It writes an incident row to SQLite running in write-ahead-logging mode, which lets the dashboard read while the pipeline writes without blocking. And it broadcasts an INCIDENT_ALERT message over WebSocket to every open dashboard. The fields shown are the real payload fields; the values are an example. Severity is configurable: missing helmet or vest is high, missing mask is medium. Cameras also send heartbeats with signal strength and free memory, and a camera silent for 15 seconds is marked offline.</aside>
+</section>

@@ -1,0 +1,33 @@
+<section id="parameters" style="background:#F3EFE6;color:#15171C;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#9A4A0C;letter-spacing:4px;text-transform:uppercase">14 · Parameters</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#15171C">Every threshold is tunable from config</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:48px">
+<table style="flex:1;font-size:28px;color:#15171C">
+<tr><th style="width:62%">Model</th><th style="width:38%">Value</th></tr>
+<tr><td>Architecture</td><td>YOLOv8n</td></tr>
+<tr><td>Input resolution</td><td>640 × 640</td></tr>
+<tr><td>NMS IoU</td><td>0.40</td></tr>
+<tr><td>Person gate</td><td>0.35</td></tr>
+<tr><td>Worn PPE gate</td><td>0.40</td></tr>
+<tr><td>Violation gate</td><td>0.50</td></tr>
+</table>
+<table style="flex:1;font-size:28px;color:#15171C">
+<tr><th style="width:62%">Rules</th><th style="width:38%">Value</th></tr>
+<tr><td>PPE containment</td><td>≥ 0.50</td></tr>
+<tr><td>Sliding window</td><td>10.0 s</td></tr>
+<tr><td>Confirm ratio</td><td>0.70</td></tr>
+<tr><td>Clear ratio</td><td>0.30</td></tr>
+<tr><td>Min observations</td><td>3 frames</td></tr>
+<tr><td>Worker timeout</td><td>10.0 s</td></tr>
+</table>
+</div>
+<p style="font-size:24px;color:#4A4F59">Override any value with a <span style="color:#9A4A0C">SITEGUARD_*</span> environment variable, e.g. SITEGUARD_CONFIRM_RATIO=0.8</p>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#4A4F59">SITEGUARD</p>
+<p style="font-size:24px;color:#4A4F59">14</p>
+</div>
+<aside>All the numbers from the previous slides in one place. The left table covers the detector, the right table the association and rule engine. Every value lives in app/config.py and can be overridden with an environment variable, so a site with stricter rules, for example a longer window or a higher confirm ratio, needs no code change.</aside>
+</section>

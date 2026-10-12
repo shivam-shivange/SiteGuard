@@ -1,0 +1,49 @@
+<section id="objectives" style="background:#15171C;color:#F2EEE6;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518;letter-spacing:4px;text-transform:uppercase">03 · Objectives</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#F2EEE6">Five objectives shaped every design choice</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;background:#1F232B;border-top:6px solid #F5C518;border-radius:16px;padding:32px">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:700;color:#F5C518;line-height:1">01</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6;line-height:1.2">Edge ingestion</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Stream QVGA frames from wireless ESP32-CAM nodes at 5 FPS.</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;background:#1F232B;border-top:6px solid #F5C518;border-radius:16px;padding:32px">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:700;color:#F5C518;line-height:1">02</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6;line-height:1.2">Accurate attribution</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Tie each PPE item to the right worker by box containment.</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;background:#1F232B;border-top:6px solid #F5C518;border-radius:16px;padding:32px">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:700;color:#F5C518;line-height:1">03</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6;line-height:1.2">Stable identity</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Keep worker IDs through occlusions with BoT-SORT Re-ID.</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;background:#1F232B;border-top:6px solid #F5C518;border-radius:16px;padding:32px">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:700;color:#F5C518;line-height:1">04</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6;line-height:1.2">Zero flapping</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Alert only after PPE is missing in 70% of a 10 s window.</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;background:#1F232B;border-top:6px solid #F5C518;border-radius:16px;padding:32px">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:700;color:#F5C518;line-height:1">05</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6;line-height:1.2">Live visibility</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">WebSocket alerts, snapshot evidence and SQLite logging.</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#B8BEC9">SITEGUARD</p>
+<p style="font-size:24px;color:#B8BEC9">03</p>
+</div>
+<aside>These five objectives are the yardstick for the rest of the talk. One: get frames off cheap wireless camera nodes reliably. Two: decide which worker each hardhat or vest belongs to, even when people stand side by side. Three: keep a worker's identity when they walk behind a pillar or cross another worker. Four: never flood the dashboard with flickering alerts, so a violation must persist across 70 percent of a 10-second window. Five: make every confirmed violation visible immediately, with photo evidence and a permanent log.</aside>
+</section>

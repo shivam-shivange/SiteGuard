@@ -1,0 +1,52 @@
+<section id="hardware" style="background:#F3EFE6;color:#15171C;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#9A4A0C;letter-spacing:4px;text-transform:uppercase">06 · Edge hardware</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#15171C">A low-cost ESP32-CAM is the eye on site</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:24px">
+<div style="background:#FBF9F4;border:2px solid #DDD6C8;border-radius:16px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#15171C">240 MHz</p>
+<p style="font-size:24px;line-height:1.4;color:#4A4F59">Dual-core Xtensa LX6 on the AI-Thinker board</p>
+</div>
+<div style="background:#FBF9F4;border:2px solid #DDD6C8;border-radius:16px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#15171C">OV2640</p>
+<p style="font-size:24px;line-height:1.4;color:#4A4F59">2 MP CMOS sensor with on-chip JPEG output</p>
+</div>
+<div style="background:#FBF9F4;border:2px solid #DDD6C8;border-radius:16px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#15171C">4 MB</p>
+<p style="font-size:24px;line-height:1.4;color:#4A4F59">PSRAM for frame buffers, plus 520 KB SRAM</p>
+</div>
+<div style="background:#FBF9F4;border:2px solid #DDD6C8;border-radius:16px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#15171C">2.4 GHz</p>
+<p style="font-size:24px;line-height:1.4;color:#4A4F59">802.11 b/g/n Wi-Fi link to the host PC</p>
+</div>
+</div>
+<div style="background:#F5C518;border-radius:16px;padding:24px 32px;display:flex;flex-direction:row;gap:16px;align-items:center">
+<x-icon name="Settings" style="color:#15171C;width:36px;height:36px"></x-icon>
+<p style="font-size:24px;line-height:1.4;color:#15171C"><b>Host:</b> local PC edge server (Ryzen 5 5625U) runs FastAPI, YOLO and SQLite</p>
+</div>
+</div>
+<div style="width:720px;background:#15171C;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-size:32px;font-weight:600;color:#F5C518">Camera pin map</h3>
+<table style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F2EEE6">
+<tr><th style="width:42%;color:#B8BEC9">Signal</th><th style="width:58%;color:#B8BEC9">GPIO</th></tr>
+<tr><td>PWDN</td><td>32</td></tr>
+<tr><td>XCLK (20 MHz)</td><td>0</td></tr>
+<tr><td>SIOD / SDA</td><td>26</td></tr>
+<tr><td>SIOC / SCL</td><td>27</td></tr>
+<tr><td>VSYNC</td><td>25</td></tr>
+<tr><td>HREF</td><td>23</td></tr>
+<tr><td>PCLK</td><td>22</td></tr>
+<tr><td>D0 – D7</td><td>5 18 19 21 36 39 34 35</td></tr>
+</table>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#4A4F59">SITEGUARD</p>
+<p style="font-size:24px;color:#4A4F59">06</p>
+</div>
+<aside>The camera node is an AI-Thinker ESP32-CAM: a dual-core 240 MHz microcontroller with an OV2640 2-megapixel sensor, 4 MB of PSRAM and built-in Wi-Fi, all for a few hundred rupees. It does no AI itself; it captures JPEG frames and ships them to a local PC that runs the heavy model. This edge-to-host split keeps the node cheap, cool and low-power. The table on the right is the standard AI-Thinker camera pinout we configure in firmware: the SCCB control bus on GPIO 26 and 27, clock and sync lines, and the 8-bit parallel data bus. Power is a stabilised 5 V supply.</aside>
+</section>

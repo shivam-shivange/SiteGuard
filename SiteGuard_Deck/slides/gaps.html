@@ -1,0 +1,18 @@
+<section id="gaps" style="background:#15171C;color:#F2EEE6;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518;letter-spacing:4px;text-transform:uppercase">17 · Roadmap</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#F2EEE6">Four gaps define the next phase</h2>
+</div>
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:24px">
+<div style="background:#1F232B;border-radius:16px;padding:36px;display:flex;flex-direction:column;gap:12px"><x-icon name="Globe" style="color:#F5C518;width:44px;height:44px"></x-icon><h3 style="font-size:32px;font-weight:600">3D proximity zones</h3><p style="font-size:24px;line-height:1.4;color:#B8BEC9">Camera homography turns pixels into ground distance, so worker-to-machine gaps are measured in metres.</p></div>
+<div style="background:#1F232B;border-radius:16px;padding:36px;display:flex;flex-direction:column;gap:12px"><x-icon name="Code" style="color:#F5C518;width:44px;height:44px"></x-icon><h3 style="font-size:32px;font-weight:600">TinyML on the node</h3><p style="font-size:24px;line-height:1.4;color:#B8BEC9">A tiny person-presence model on the ESP32 sends frames only when someone is in view.</p></div>
+<div style="background:#1F232B;border-radius:16px;padding:36px;display:flex;flex-direction:column;gap:12px"><x-icon name="Users" style="color:#F5C518;width:44px;height:44px"></x-icon><h3 style="font-size:32px;font-weight:600">Pose estimation</h3><p style="font-size:24px;line-height:1.4;color:#B8BEC9">YOLOv8-pose keypoints to detect slips, falls from height and unsafe postures.</p></div>
+<div style="background:#2A2410;border:2px solid #F5C518;border-radius:16px;padding:36px;display:flex;flex-direction:column;gap:12px"><x-icon name="Warning" style="color:#F5C518;width:44px;height:44px"></x-icon><h3 style="font-size:32px;font-weight:600">Two-way IoT actuation</h3><p style="font-size:24px;line-height:1.4;color:#D9CFA8">Server sends alarm commands back in the frame response (or MQTT) to sound a buzzer on site.</p></div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#B8BEC9">SITEGUARD</p>
+<p style="font-size:24px;color:#B8BEC9">17</p>
+</div>
+<aside>We are honest about what is not done. One: proximity to machinery is only 2D today; a calibrated homography would give real ground distances. Two: the ESP32 streams every frame; a tiny on-device model could wake the stream only when a person is present, saving bandwidth and power. Three: bounding boxes cannot see a fall; pose keypoints can. Four, highlighted because it is the quickest win: alerts currently reach only the dashboard. The ESP32 already receives an HTTP response for every frame, so the server can put an alarm command in that response and the node can drive a buzzer and LED with no new infrastructure; MQTT is the production-scale alternative.</aside>
+</section>

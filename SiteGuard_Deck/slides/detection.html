@@ -1,0 +1,55 @@
+<section id="detection" style="background:#15171C;color:#F2EEE6;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518;letter-spacing:4px;text-transform:uppercase">09 · Detection model</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#F2EEE6">YOLOv8n uses a different confidence gate per class</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:48px">
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:24px">
+<div style="background:#1F232B;border-radius:16px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#F2EEE6">YOLOv8n</p>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Anchor-free, single-stage, PAN-FPN neck</p>
+</div>
+<div style="background:#1F232B;border-radius:16px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#F2EEE6">6.2 MB</p>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Custom weights; PyTorch or ONNX Runtime</p>
+</div>
+<div style="background:#1F232B;border-radius:16px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#F2EEE6">10 classes</p>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Person, PPE worn and missing, cone, machinery, vehicle</p>
+</div>
+<div style="background:#1F232B;border-radius:16px;padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1;color:#F2EEE6">NMS 0.40</p>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Tighter than the 0.70 default to cut duplicate boxes</p>
+</div>
+</div>
+<div style="width:820px;background:#1F232B;border-radius:20px;padding:40px;display:flex;flex-direction:column;justify-content:space-between">
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6">Confidence gates (0 – 0.6 scale)</h3>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#F2EEE6">Person · never miss a worker</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">0.35</p></div>
+<div style="height:24px;background:#2E333D;border-radius:12px;display:flex;flex-direction:row"><div style="width:432px;background:#F5C518;border-radius:12px"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#F2EEE6">Hardhat · Vest · Mask (worn)</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B8BEC9">0.40</p></div>
+<div style="height:24px;background:#2E333D;border-radius:12px;display:flex;flex-direction:row"><div style="width:493px;background:#8A93A3;border-radius:12px"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#F2EEE6">Safety cone</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B8BEC9">0.40</p></div>
+<div style="height:24px;background:#2E333D;border-radius:12px;display:flex;flex-direction:row"><div style="width:493px;background:#8A93A3;border-radius:12px"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#F2EEE6">Machinery · Vehicle</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B8BEC9">0.45</p></div>
+<div style="height:24px;background:#2E333D;border-radius:12px;display:flex;flex-direction:row"><div style="width:555px;background:#8A93A3;border-radius:12px"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#F2EEE6">NO-Hardhat · NO-Vest · NO-Mask · fewer false alarms</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#FF8A3D">0.50</p></div>
+<div style="height:24px;background:#2E333D;border-radius:12px;display:flex;flex-direction:row"><div style="width:617px;background:#FF8A3D;border-radius:12px"></div></div>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#B8BEC9">SITEGUARD</p>
+<p style="font-size:24px;color:#B8BEC9">09</p>
+</div>
+<aside>The detector is YOLOv8 nano, the smallest Ultralytics model at about 6 megabytes, trained on our 10 construction classes. It runs at 640 by 640 on a laptop CPU, and we support ONNX Runtime for extra CPU throughput. The key design choice is asymmetric confidence gates. Missing a worker is the worst failure, so Person has the lowest gate at 0.35. A false violation alarm erodes trust, so the NO-hardhat, NO-vest and NO-mask classes need 0.50. Worn PPE and cones sit at 0.40, machinery and vehicles at 0.45. We also tightened non-maximum suppression to 0.40 to remove duplicate overlapping boxes, especially vest boxes overlapping person boxes.</aside>
+</section>

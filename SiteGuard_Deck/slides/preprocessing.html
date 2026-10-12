@@ -1,0 +1,49 @@
+<section id="preprocessing" style="background:#F3EFE6;color:#15171C;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#9A4A0C;letter-spacing:4px;text-transform:uppercase">08 · Image preprocessing</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#15171C">CLAHE lifts shadows without washing out hi-vis colours</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:56px">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;flex-direction:row;gap:24px;align-items:start">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:44px;font-weight:700;background:#F5C518;color:#15171C;padding:4px 20px;border-radius:12px">1</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px"><h3 style="font-size:32px;font-weight:600;color:#15171C">Decode</h3><p style="font-size:24px;line-height:1.4;color:#4A4F59">cv2.imdecode turns the JPEG bytes into a BGR array.</p></div>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:start">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:44px;font-weight:700;background:#F5C518;color:#15171C;padding:4px 20px;border-radius:12px">2</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px"><h3 style="font-size:32px;font-weight:600;color:#15171C">BGR to CIE LAB</h3><p style="font-size:24px;line-height:1.4;color:#4A4F59">Separates lightness (L) from colour (A and B).</p></div>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:start">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:44px;font-weight:700;background:#F5C518;color:#15171C;padding:4px 20px;border-radius:12px">3</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px"><h3 style="font-size:32px;font-weight:600;color:#15171C">CLAHE on L only</h3><p style="font-size:24px;line-height:1.4;color:#4A4F59">clipLimit 2.0, 8×8 tiles: local contrast boost, capped noise.</p></div>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:start">
+<p style="font-family:'Oswald', Arial, sans-serif;font-size:44px;font-weight:700;background:#F5C518;color:#15171C;padding:4px 20px;border-radius:12px">4</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px"><h3 style="font-size:32px;font-weight:600;color:#15171C">Back to BGR, letterbox</h3><p style="font-size:24px;line-height:1.4;color:#4A4F59">Optional 3×3 denoise, then pad to 640×640 for the model.</p></div>
+</div>
+</div>
+<div style="width:820px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;flex-direction:row;gap:40px">
+<p style="width:390px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A4F59">RAW · backlit</p>
+<p style="width:390px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#9A4A0C">AFTER CLAHE</p>
+</div>
+<svg aria-label="Illustration: the same scaffold scene before CLAHE, dark and muddy, and after CLAHE, with the worker's yellow hardhat and orange vest clearly visible" viewBox="0 0 820 460" width="820" height="460" style="width:820px;height:460px">
+<rect x="0" y="0" width="390" height="460" rx="16" fill="#2A2C30"/>
+<g stroke="#3A3C40" stroke-width="8"><line x1="250" y1="0" x2="250" y2="400"/><line x1="350" y1="0" x2="350" y2="400"/><line x1="250" y1="130" x2="350" y2="130"/><line x1="250" y1="260" x2="350" y2="260"/><line x1="250" y1="130" x2="350" y2="260"/></g>
+<rect x="0" y="400" width="390" height="60" fill="#232428"/>
+<g transform="translate(120 0)" stroke-linecap="round"><line x1="40" y1="300" x2="32" y2="400" stroke="#2F3136" stroke-width="16"/><line x1="64" y1="300" x2="72" y2="400" stroke="#2F3136" stroke-width="16"/><rect x="22" y="190" width="60" height="116" rx="14" fill="#4A3424"/><circle cx="52" cy="160" r="28" fill="#3D3128"/><path d="M22 156 a30 30 0 0 1 60 0 z" fill="#4E4628"/></g>
+<rect x="430" y="0" width="390" height="460" rx="16" fill="#9FB2C2"/>
+<g stroke="#5C636E" stroke-width="8"><line x1="680" y1="0" x2="680" y2="400"/><line x1="780" y1="0" x2="780" y2="400"/><line x1="680" y1="130" x2="780" y2="130"/><line x1="680" y1="260" x2="780" y2="260"/><line x1="680" y1="130" x2="780" y2="260"/></g>
+<rect x="430" y="400" width="390" height="60" fill="#7D7466"/>
+<g transform="translate(550 0)" stroke-linecap="round"><line x1="40" y1="300" x2="32" y2="400" stroke="#4A5160" stroke-width="16"/><line x1="64" y1="300" x2="72" y2="400" stroke="#4A5160" stroke-width="16"/><rect x="22" y="190" width="60" height="116" rx="14" fill="#FF8A3D"/><rect x="22" y="236" width="60" height="10" fill="#F2EEE6"/><rect x="22" y="266" width="60" height="10" fill="#F2EEE6"/><circle cx="52" cy="160" r="28" fill="#C9A27E"/><path d="M22 156 a30 30 0 0 1 60 0 z" fill="#F5C518"/><rect x="16" y="152" width="72" height="9" rx="4" fill="#F5C518"/></g>
+</svg>
+<p style="font-size:24px;line-height:1.4;color:#4A4F59">Measured cost under 4.2 ms per frame on a Ryzen 5 CPU, so it never bottlenecks ingestion.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#4A4F59">SITEGUARD</p>
+<p style="font-size:24px;color:#4A4F59">08</p>
+</div>
+<aside>Construction sites are hard lighting: harsh shadows under scaffolding, backlit workers against the sky, dawn and dusk. A plain brightness boost washes out colour, and colour is exactly what identifies a hardhat or a vest. So we convert to the CIE LAB colour space, which separates lightness from colour, and run CLAHE, contrast limited adaptive histogram equalization, only on the lightness channel. It boosts contrast tile by tile, and the clip limit of 2.0 stops it amplifying noise. Colour channels are untouched, so safety yellow and orange stay true. The illustration is a simplified depiction of the effect, not a real frame. The whole step costs a few milliseconds.</aside>
+</section>

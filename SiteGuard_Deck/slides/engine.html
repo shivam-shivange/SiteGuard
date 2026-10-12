@@ -1,0 +1,36 @@
+<section id="engine" style="background:#F3EFE6;color:#15171C;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#9A4A0C;letter-spacing:4px;text-transform:uppercase">12 · Safety rule engine</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#15171C">Hysteresis turns flickering detections into one alert</h2>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:48px">
+<div style="width:560px;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FBF9F4;border:2px solid #DDD6C8;border-radius:16px;padding:28px"><h3 style="font-size:32px;font-weight:600;color:#15171C">10 s sliding window</h3><p style="font-size:24px;line-height:1.4;color:#4A4F59">Per worker; at least 3 frames before any verdict</p></div>
+<div style="background:#FBF9F4;border:2px solid #DDD6C8;border-radius:16px;padding:28px"><h3 style="font-size:32px;font-weight:600;color:#15171C">Confirm at 70%, clear at 30%</h3><p style="font-size:24px;line-height:1.4;color:#4A4F59">The 40-point gap stops alerts flapping on head turns</p></div>
+<div style="background:#FBF9F4;border:2px solid #DDD6C8;border-radius:16px;padding:28px"><h3 style="font-size:32px;font-weight:600;color:#15171C">One incident per episode</h3><p style="font-size:24px;line-height:1.4;color:#4A4F59">More missing items update it; no duplicates</p></div>
+</div>
+<div style="flex:1;position:relative;background:#15171C;border-radius:20px">
+<svg aria-label="Chart: share of frames with PPE missing rises above the 70 percent confirm line, raising one incident, then falls below the 30 percent clear line, clearing it" viewBox="0 0 1056 618" width="1056" height="618" style="position:absolute;left:0px;top:0px;width:1056px;height:618px">
+<rect x="80" y="70" width="900" height="440" fill="#1C1F26"/>
+<line x1="80" y1="202" x2="980" y2="202" stroke="#FF8A3D" stroke-width="3" stroke-dasharray="14 10"/>
+<line x1="80" y1="378" x2="980" y2="378" stroke="#F5C518" stroke-width="3" stroke-dasharray="14 10"/>
+<rect x="430" y="70" width="330" height="440" fill="#FF8A3D" opacity="0.14"/>
+<polyline points="80,470 160,440 220,400 260,430 320,330 380,260 430,195 490,140 560,120 630,150 700,250 760,385 830,440 900,465 980,470" fill="none" stroke="#F2EEE6" stroke-width="6" stroke-linejoin="round"/>
+<circle cx="430" cy="195" r="12" fill="#FF8A3D"/>
+<circle cx="760" cy="385" r="12" fill="#F5C518"/>
+<line x1="80" y1="510" x2="980" y2="510" stroke="#3A404B" stroke-width="3"/>
+</svg>
+<p style="position:absolute;left:792px;top:150px;width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#FF8A3D">CONFIRM 70%</p>
+<p style="position:absolute;left:792px;top:384px;width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">CLEAR 30%</p>
+<p style="position:absolute;left:440px;top:80px;width:320px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#FF8A3D">INCIDENT OPEN</p>
+<p style="position:absolute;left:80px;top:24px;width:700px;font-size:24px;color:#B8BEC9">Share of frames with PPE missing</p>
+<p style="position:absolute;left:80px;top:530px;width:900px;font-size:24px;color:#B8BEC9">Time →  a brief dip at 260 never triggers; one alert opens, then clears</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#4A4F59">SITEGUARD</p>
+<p style="font-size:24px;color:#4A4F59">12</p>
+</div>
+<aside>This is the core of SiteGuard. A single frame saying no hardhat is not evidence: the worker may have turned their head or been briefly occluded. So for each tracked worker we keep a 10-second window of observations. An item is confirmed missing only when it is missing in at least 70 percent of those frames, and the violation clears only when that share drops to 30 percent or below. The gap between the two thresholds is hysteresis, the same idea as a thermostat, and it stops alerts flapping on and off. The chart is illustrative: the early bump never reaches the confirm line, so no alert; the real violation opens exactly one incident, which closes once the worker puts the hardhat back on. If a second item goes missing during the episode, the same incident is updated rather than duplicated.</aside>
+</section>

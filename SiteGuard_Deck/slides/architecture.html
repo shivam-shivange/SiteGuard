@@ -1,0 +1,62 @@
+<section id="architecture" style="background:#15171C;color:#F2EEE6;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:12px;background:repeating-linear-gradient(-45deg, #F5C518 0px, #F5C518 16px, #15171C 16px, #15171C 32px)"></div>
+<div style="position:absolute;left:128px;top:444px;width:1664px;height:4px;background:#3A404B"></div>
+<div style="position:absolute;left:128px;top:764px;width:1664px;height:4px;background:#3A404B"></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518;letter-spacing:4px;text-transform:uppercase">05 · Architecture</p>
+<h2 style="font-family:'Oswald', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#F2EEE6">Every frame passes through eight stages</h2>
+</div>
+<div style="position:absolute;left:128px;top:300px;width:392px;height:290px;background:#1F232B;border:2px solid #2E333D;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">01</p>
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6">Ingestion</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">ESP32-CAM or webcam posts raw JPEG over HTTP at 5 FPS.</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A93A3">routes/camera.py</p>
+</div>
+<div style="position:absolute;left:552px;top:300px;width:392px;height:290px;background:#1F232B;border:2px solid #2E333D;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">02</p>
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6">Preprocessing</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">BGR to LAB, CLAHE on the L channel, then back to BGR.</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A93A3">preprocessor.py</p>
+</div>
+<div style="position:absolute;left:976px;top:300px;width:392px;height:290px;background:#1F232B;border:2px solid #2E333D;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">03</p>
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6">Detection</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">YOLOv8n at 640×640 finds people, PPE and machinery.</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A93A3">inference.py</p>
+</div>
+<div style="position:absolute;left:1400px;top:300px;width:392px;height:290px;background:#1F232B;border:2px solid #2E333D;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">04</p>
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6">Tracking</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">BoT-SORT with Re-ID keeps each worker's track ID.</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A93A3">botsort_reid.yaml</p>
+</div>
+<div style="position:absolute;left:128px;top:620px;width:392px;height:290px;background:#1F232B;border:2px solid #2E333D;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">05</p>
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6">Association</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Containment assigns each PPE box to its wearer.</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A93A3">inference.py</p>
+</div>
+<div style="position:absolute;left:552px;top:620px;width:392px;height:290px;background:#2A2410;border:2px solid #F5C518;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">06</p>
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6">Safety engine</h3>
+<p style="font-size:24px;line-height:1.4;color:#D9CFA8">10 s window: confirm at 70%, clear at 30%.</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B8A970">safety_engine.py</p>
+</div>
+<div style="position:absolute;left:976px;top:620px;width:392px;height:290px;background:#1F232B;border:2px solid #2E333D;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">07</p>
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6">Persistence</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">Evidence JPEG saved; incident row written to SQLite.</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A93A3">event_manager.py</p>
+</div>
+<div style="position:absolute;left:1400px;top:620px;width:392px;height:290px;background:#1F232B;border:2px solid #2E333D;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F5C518">08</p>
+<h3 style="font-size:32px;font-weight:600;color:#F2EEE6">Live dashboard</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8BEC9">WebSocket pushes alerts and worker status instantly.</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A93A3">websocket_hub.py</p>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#B8BEC9">SITEGUARD</p>
+<p style="font-size:24px;color:#B8BEC9">05</p>
+</div>
+<aside>Read the stages left to right, top row then bottom row. A frame arrives over HTTP from the ESP32-CAM. It is contrast-enhanced with CLAHE, run through YOLOv8n, and the people in it are tracked with BoT-SORT so each worker keeps the same ID across frames. PPE boxes are then assigned to the worker they sit inside. The highlighted stage, the safety engine, is where we decide whether a violation is real; it is the heart of the system and gets its own slide. Confirmed incidents are saved with photo evidence and pushed to the dashboard over WebSocket. Each card names the file that implements it, so the code structure mirrors the pipeline.</aside>
+</section>
