@@ -726,6 +726,16 @@
     .toast { background: var(--panel); border: 1px solid var(--red); border-left: 4px solid var(--red); border-radius: 10px;
       padding: 12px 14px; color: var(--text); box-shadow: 0 10px 30px rgba(0,0,0,.5); cursor: pointer; font-size: 13px; }
     .toast small { color: var(--text-muted); display: block; margin-top: 4px; }
+    .alarm-overlay { display: none; position: fixed; inset: 0; z-index: 3000; align-items: center; justify-content: center;
+      padding: 16px; background: rgba(127, 29, 29, 0.85); animation: alarmFlash 0.8s infinite alternate; }
+    @keyframes alarmFlash { from { background: rgba(127, 29, 29, 0.85); } to { background: rgba(239, 68, 68, 0.6); } }
+    .alarm-card { background: var(--panel); border: 2px solid var(--red); border-radius: 16px; padding: 24px;
+      max-width: 420px; width: 100%; text-align: center; color: var(--text); }
+    .alarm-icon { font-size: 48px; }
+    .alarm-card h2 { margin: 8px 0; font-size: 20px; }
+    .alarm-card p { color: var(--text-muted); margin-bottom: 12px; }
+    .alarm-card img { width: 100%; border-radius: 10px; margin-bottom: 14px; max-height: 40vh; object-fit: contain; }
+    .alarm-card button { width: 100%; padding: 14px; font-size: 16px; }
     .roles-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 18px; }
     .roles-table td, .roles-table th { padding: 8px; border-bottom: 1px solid var(--card-border); text-align: left; }
     .roles-table select { background: #0b1424; color: var(--text); border: 1px solid var(--card-border); border-radius: 6px; padding: 4px; }
@@ -1179,6 +1189,17 @@
     </div>
   </div>
   <div id="toastStack"></div>
+
+  <!-- Violation alarm (stays until acknowledged) -->
+  <div id="alarmOverlay" class="alarm-overlay">
+    <div class="alarm-card">
+      <div class="alarm-icon">🚨</div>
+      <h2 id="alarmTitle"></h2>
+      <p id="alarmDetail"></p>
+      <img id="alarmSnap" alt="Violation snapshot">
+      <button class="btn-action primary" onclick="acknowledgeAlarm()">✔ Acknowledge</button>
+    </div>
+  </div>
 
   <script>
     function el(id) { return document.getElementById(id); }
@@ -1756,9 +1777,50 @@
       toast.onclick = () => { if (n.snapshot_filename) openModal(`/snapshots/${n.snapshot_filename}`, title); toast.remove(); };
       el('toastStack').prepend(toast);
       setTimeout(() => toast.remove(), 12000);
+      raiseAlarm(title, detail, n);
       if ('Notification' in window && Notification.permission === 'granted') {
         new Notification(title, { body: detail, tag: `incident-${n.id}` });
       }
+    }
+
+    // ── Alarm: siren + vibration until the in-charge acknowledges ──
+    let audioCtx = null, alarmTimer = null;
+    // Browsers only allow sound after a user gesture; unlock audio on the first tap/click.
+    function unlockAudio() {
+      if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    ['click', 'touchstart', 'keydown'].forEach(evt => document.addEventListener(evt, unlockAudio, { passive: true }));
+
+    function sirenBurst() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(), t = audioCtx.currentTime;
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(650, t);
+      osc.frequency.linearRampToValueAtTime(1300, t + 0.45);
+      osc.frequency.linearRampToValueAtTime(650, t + 0.9);
+      gain.gain.setValueAtTime(0.35, t);
+      gain.gain.setValueAtTime(0, t + 0.9);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.95);
+      if (navigator.vibrate) navigator.vibrate([600, 300, 600]);
+    }
+
+    function raiseAlarm(title, detail, n) {
+      el('alarmTitle').innerText = title;
+      el('alarmDetail').innerText = detail;
+      el('alarmSnap').style.display = n.snapshot_filename ? '' : 'none';
+      if (n.snapshot_filename) el('alarmSnap').src = `/snapshots/${n.snapshot_filename}`;
+      el('alarmOverlay').style.display = 'flex';
+      if (!alarmTimer) { sirenBurst(); alarmTimer = setInterval(sirenBurst, 1200); }
+    }
+
+    function acknowledgeAlarm() {
+      clearInterval(alarmTimer);
+      alarmTimer = null;
+      if (navigator.vibrate) navigator.vibrate(0);
+      el('alarmOverlay').style.display = 'none';
     }
 
     function openNotifications() {
