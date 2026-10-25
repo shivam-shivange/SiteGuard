@@ -9,13 +9,13 @@
 // WiFi
 // =====================================================
 
-const char* WIFI_SSID = "Velxio-GUEST";
-const char* WIFI_PASSWORD = "";
+const char* WIFI_SSID = "Basweshvar Bhavan_A2";
+const char* WIFI_PASSWORD = "Net@8055";
 
 // PC LAN address running the FastAPI backend. Use ipconfig to update this
 // value if the router assigns the PC a different address in the future.
 const char* SERVER_URL =
-    "http://192.168.0.102:8000/api/camera/frame";
+    "http://192.168.0.101:8000/api/camera/frame";
 
 const char* CAMERA_ID = "CAM-01";
 const char* CAMERA_NAME = "ESP32-CAM 01";

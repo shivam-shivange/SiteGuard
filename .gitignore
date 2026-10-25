@@ -23,3 +23,5 @@ safety.db
 *.mkv
 *.webm
 **/videos/
+Ultralytics/
+**/Ultralytics/
