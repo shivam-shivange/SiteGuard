@@ -15,14 +15,19 @@ class WebSocketHub:
 
     def __init__(self) -> None:
         self._connections: set[WebSocket] = set()
+        # Signed-in dashboard sockets -> their user (for role-based notifications)
+        self._users: dict[WebSocket, dict[str, Any]] = {}
 
-    async def connect(self, ws: WebSocket) -> None:
+    async def connect(self, ws: WebSocket, user: dict[str, Any] | None = None) -> None:
         await ws.accept()
         self._connections.add(ws)
+        if user is not None:
+            self._users[ws] = user
         logger.info("WebSocket connected (%d active)", len(self._connections))
 
     def disconnect(self, ws: WebSocket) -> None:
         self._connections.discard(ws)
+        self._users.pop(ws, None)
         logger.info("WebSocket disconnected (%d active)", len(self._connections))
 
     async def broadcast(self, event_or_data: str | dict[str, Any], data: dict[str, Any] | None = None) -> None:
@@ -44,6 +49,20 @@ class WebSocketHub:
             self._connections.discard(ws)
         if dead:
             logger.debug("Pruned %d dead WebSocket(s)", len(dead))
+
+    async def notify_users(self, user_ids: set[int], payload: dict[str, Any]) -> int:
+        """Send a notification to every socket of the given users and all admins."""
+        message = json.dumps({"event": "notification", "data": payload})
+        sent = 0
+        for ws, user in list(self._users.items()):
+            if user["role"] != "admin" and user["id"] not in user_ids:
+                continue
+            try:
+                await ws.send_text(message)
+                sent += 1
+            except Exception:
+                self.disconnect(ws)
+        return sent
 
     @property
     def active_count(self) -> int:

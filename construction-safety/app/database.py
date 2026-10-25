@@ -75,7 +75,27 @@ def setup() -> None:
             free_heap INTEGER,
             last_seen TEXT NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            display_name TEXT NOT NULL,
+            role TEXT NOT NULL CHECK (role IN ('admin', 'incharge')),
+            password_hash TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS sessions (
+            token TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            created_at TEXT NOT NULL
+        );
     """)
+    # One site in-charge per camera (column added to pre-existing databases).
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(cameras)")}
+    if "incharge_user_id" not in columns:
+        conn.execute("ALTER TABLE cameras ADD COLUMN incharge_user_id INTEGER REFERENCES users(id)")
+        conn.commit()
     logger.info("Database initialised at %s (WAL mode)", DB_PATH)
 
 

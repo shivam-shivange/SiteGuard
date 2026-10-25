@@ -16,8 +16,10 @@ from app.config import (
     ENABLE_CORS,
     SNAPSHOT_DIR,
 )
+from app.auth import ensure_default_admin, user_for_token
 from app.database import init_db
 from app.detection.model_manager import model_manager
+from app.routes.auth import router as auth_router
 from app.routes.camera import router as camera_router
 from app.routes.dashboard import build_overview
 from app.routes.dashboard import router as dashboard_router
@@ -41,6 +43,7 @@ async def lifespan(app: FastAPI):
     """Application startup and shutdown events."""
     logger.info("Initializing SiteGuard database...")
     init_db()
+    ensure_default_admin()
 
     logger.info("Validating detection model...")
     await asyncio.to_thread(model_manager.load)
@@ -75,6 +78,7 @@ if ENABLE_CORS:
     )
 
 # Register API routers
+app.include_router(auth_router)
 app.include_router(camera_router)
 app.include_router(incidents_router)
 app.include_router(system_router)
@@ -93,8 +97,11 @@ async def serve_dashboard():
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time incident broadcasts."""
-    await ws_hub.connect(websocket)
+    """WebSocket endpoint for real-time incident broadcasts.
+
+    Pass ``?token=<session token>`` to also receive role-based notifications.
+    """
+    await ws_hub.connect(websocket, user_for_token(websocket.query_params.get("token")))
     try:
         while True:
             # Keep connection open and consume incoming client messages if any

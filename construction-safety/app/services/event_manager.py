@@ -14,13 +14,33 @@ from typing import Any
 import cv2
 
 from app.config import SNAPSHOT_DIR
-from app.database import record_incident, update_incident_violations
+from app.database import query, record_incident, update_incident_violations
 from app.websocket_hub import ws_hub
 
 logger = logging.getLogger("siteguard.event_manager")
 
 SNAPSHOT_PATH = Path(SNAPSHOT_DIR)
 SNAPSHOT_PATH.mkdir(parents=True, exist_ok=True)
+
+
+async def notify_incharge(event_payload: dict[str, Any]) -> None:
+    """Push a violation notification to the camera's site in-charge (and admins)."""
+    rows = query(
+        "SELECT c.name AS camera_name, c.location, c.incharge_user_id, u.display_name AS incharge "
+        "FROM cameras c LEFT JOIN users u ON u.id = c.incharge_user_id WHERE c.id = ?",
+        (event_payload["camera_id"],),
+    )
+    camera = rows[0] if rows else {}
+    incharge_id = camera.get("incharge_user_id")
+    await ws_hub.notify_users(
+        {incharge_id} if incharge_id is not None else set(),
+        {
+            **event_payload,
+            "camera_name": camera.get("camera_name") or event_payload["camera_id"],
+            "location": camera.get("location"),
+            "incharge": camera.get("incharge"),
+        },
+    )
 
 
 async def handle_incident_event(
@@ -67,6 +87,7 @@ async def handle_incident_event(
     }
 
     await ws_hub.broadcast(event_payload)
+    await notify_incharge(event_payload)
     logger.warning(
         "ALERT [%s]: Camera %s - Violation '%s' (Track ID: %s, Conf: %.2f)",
         severity,

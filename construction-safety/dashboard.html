@@ -715,6 +715,20 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* ── Roles, login & notifications ── */
+    .auth-input { width: 100%; padding: 10px 12px; margin-bottom: 10px; background: #0b1424; color: var(--text);
+      border: 1px solid var(--card-border); border-radius: 8px; font: inherit; box-sizing: border-box; }
+    .user-chip { font-size: 12px; color: var(--text-muted); padding: 6px 10px; border: 1px solid var(--card-border); border-radius: 999px; }
+    .user-chip b { color: var(--text); }
+    .notif-badge { background: var(--red); color: #fff; border-radius: 999px; padding: 0 6px; font-size: 11px; margin-left: 4px; }
+    #toastStack { position: fixed; top: 18px; right: 18px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; max-width: 360px; }
+    .toast { background: var(--panel); border: 1px solid var(--red); border-left: 4px solid var(--red); border-radius: 10px;
+      padding: 12px 14px; color: var(--text); box-shadow: 0 10px 30px rgba(0,0,0,.5); cursor: pointer; font-size: 13px; }
+    .toast small { color: var(--text-muted); display: block; margin-top: 4px; }
+    .roles-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 18px; }
+    .roles-table td, .roles-table th { padding: 8px; border-bottom: 1px solid var(--card-border); text-align: left; }
+    .roles-table select { background: #0b1424; color: var(--text); border: 1px solid var(--card-border); border-radius: 6px; padding: 4px; }
   </style>
 </head>
 
@@ -762,6 +776,10 @@
           <p id="lastSync">Connecting to live detection engine…</p>
         </div>
         <div class="header-actions">
+          <span class="user-chip" id="userChip" style="display:none"></span>
+          <button class="btn-action" id="notifBtn" onclick="openNotifications()" style="display:none">🔔<span class="notif-badge" id="notifCount" style="display:none">0</span></button>
+          <button class="btn-action" id="rolesBtn" onclick="openRoles()" style="display:none">👥 Site In-charges</button>
+          <button class="btn-action" id="logoutBtn" onclick="doLogout()" style="display:none">⎋ Logout</button>
           <div class="live-pill" id="liveIndicator">
             <span class="pulse-dot"></span> LIVE STREAMING
           </div>
@@ -1115,6 +1133,52 @@
       <img id="modalImg" src="" style="width:100%; border-radius:10px; max-height: 70vh; object-fit: contain;">
     </div>
   </div>
+
+  <!-- Login -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-card" style="max-width:360px">
+      <h3 style="margin-bottom:14px">Sign in to SiteGuard</h3>
+      <form onsubmit="event.preventDefault(); doLogin();">
+        <input class="auth-input" id="loginUser" placeholder="Username" autocomplete="username">
+        <input class="auth-input" id="loginPass" type="password" placeholder="Password" autocomplete="current-password">
+        <p id="loginError" style="color:var(--red); font-size:12px; min-height:16px"></p>
+        <button class="btn-action primary" type="submit" style="width:100%">Sign in</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Site in-charge management (admin) -->
+  <div class="modal-overlay" id="rolesModal" onclick="el('rolesModal').style.display='none'">
+    <div class="modal-card" onclick="event.stopPropagation()" style="max-width:640px; max-height:85vh; overflow:auto">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3>Camera Site In-charges</h3>
+        <button class="btn-sm" onclick="el('rolesModal').style.display='none'">✕ Close</button>
+      </div>
+      <table class="roles-table"><thead><tr><th>Camera</th><th>Location</th><th>In-charge</th></tr></thead><tbody id="rolesCameras"></tbody></table>
+      <h3 style="margin-bottom:10px">Users</h3>
+      <table class="roles-table"><thead><tr><th>Name</th><th>Username</th><th>Role</th><th></th></tr></thead><tbody id="rolesUsers"></tbody></table>
+      <form onsubmit="event.preventDefault(); addUser();" style="display:grid; grid-template-columns:1fr 1fr; gap:0 10px">
+        <input class="auth-input" id="newName" placeholder="Full name">
+        <input class="auth-input" id="newUsername" placeholder="Username">
+        <input class="auth-input" id="newPassword" type="password" placeholder="Password (min 6)">
+        <select class="auth-input" id="newRole"><option value="incharge">Site in-charge</option><option value="admin">Admin</option></select>
+        <p id="rolesError" style="color:var(--red); font-size:12px; grid-column:1/-1"></p>
+        <button class="btn-action primary" type="submit" style="grid-column:1/-1">+ Add user</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification history -->
+  <div class="modal-overlay" id="notifModal" onclick="el('notifModal').style.display='none'">
+    <div class="modal-card" onclick="event.stopPropagation()" style="max-width:480px; max-height:80vh; overflow:auto">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3>My Violation Notifications</h3>
+        <button class="btn-sm" onclick="el('notifModal').style.display='none'">✕ Close</button>
+      </div>
+      <div id="notifList"></div>
+    </div>
+  </div>
+  <div id="toastStack"></div>
 
   <script>
     function el(id) { return document.getElementById(id); }
@@ -1623,17 +1687,147 @@
       }
     }
 
+    // ── Auth & role-based notifications ──
+    let authToken = null, currentUser = null, notifications = [];
+    try { authToken = localStorage.getItem('sg_token'); } catch (e) {}
+
+    const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    function esc(v) { return String(v ?? '').replace(/[&<>"']/g, c => ESC_MAP[c]); }
+
+    async function api(url, opts = {}) {
+      opts.headers = { 'Content-Type': 'application/json', ...(opts.headers || {}), Authorization: `Bearer ${authToken}` };
+      const res = await fetch(url, opts);
+      if (res.status === 401) { showLogin(); throw new Error('Not signed in'); }
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.detail || res.statusText);
+      return body;
+    }
+
+    function showLogin() {
+      authToken = null; currentUser = null;
+      try { localStorage.removeItem('sg_token'); } catch (e) {}
+      el('loginModal').style.display = 'flex';
+    }
+
+    async function doLogin() {
+      el('loginError').innerText = '';
+      try {
+        const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: el('loginUser').value, password: el('loginPass').value }) });
+        const body = await res.json();
+        if (!res.ok) throw new Error(body.detail || 'Login failed');
+        authToken = body.token;
+        try { localStorage.setItem('sg_token', authToken); } catch (e) {}
+        el('loginModal').style.display = 'none';
+        el('loginPass').value = '';
+        await loadSession();
+      } catch (e) { el('loginError').innerText = e.message; }
+    }
+
+    async function doLogout() {
+      try { await api('/api/auth/logout', { method: 'POST' }); } catch (e) {}
+      showLogin();
+      if (window._ws) window._ws.close();
+    }
+
+    async function loadSession() {
+      if (!authToken) return showLogin();
+      currentUser = await api('/api/auth/me');
+      const isAdmin = currentUser.role === 'admin';
+      el('userChip').innerHTML = `<b>${esc(currentUser.display_name)}</b> · ${isAdmin ? 'Admin' : 'Site In-charge'}` +
+        (isAdmin ? '' : ` · ${currentUser.cameras.length ? currentUser.cameras.map(esc).join(', ') : 'no cameras assigned'}`);
+      ['userChip', 'notifBtn', 'logoutBtn'].forEach(id => el(id).style.display = '');
+      el('rolesBtn').style.display = isAdmin ? '' : 'none';
+      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+      // Reconnect so the socket is bound to this user
+      if (window._ws) { window._ws.onclose = null; window._ws.close(); }
+      initWebSocket();
+    }
+
+    function onNotification(n) {
+      notifications.unshift(n);
+      el('notifCount').innerText = notifications.length;
+      el('notifCount').style.display = '';
+      const title = `⚠ ${n.violation_type.replaceAll('_', ' ')} — ${n.camera_name}`;
+      const detail = `Worker #${n.track_id} · ${n.severity.toUpperCase()} · ${n.location || ''}`;
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<b>${esc(title)}</b><small>${esc(detail)}</small>`;
+      toast.onclick = () => { if (n.snapshot_filename) openModal(`/snapshots/${n.snapshot_filename}`, title); toast.remove(); };
+      el('toastStack').prepend(toast);
+      setTimeout(() => toast.remove(), 12000);
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body: detail, tag: `incident-${n.id}` });
+      }
+    }
+
+    function openNotifications() {
+      el('notifCount').style.display = 'none';
+      el('notifList').innerHTML = notifications.length ? notifications.map(n => `
+        <div class="toast" style="margin-bottom:8px" onclick="${n.snapshot_filename ? `openModal('/snapshots/${esc(n.snapshot_filename)}')` : ''}">
+          <b>${esc(n.violation_type.replaceAll('_', ' '))} — ${esc(n.camera_name)}</b>
+          <small>Worker #${esc(n.track_id)} · ${esc(n.severity)} · ${new Date(n.timestamp * 1000).toLocaleTimeString()}</small>
+        </div>`).join('') : '<p style="color:var(--text-muted)">No notifications yet this session.</p>';
+      el('notifModal').style.display = 'flex';
+    }
+
+    async function openRoles() {
+      el('rolesError').innerText = '';
+      const [users, cams] = await Promise.all([api('/api/users'), api('/api/cameras')]);
+      const incharges = users.filter(u => u.role === 'incharge');
+      el('rolesCameras').innerHTML = cams.length ? cams.map(c => `<tr>
+        <td><b>${esc(c.id)}</b><br><small style="color:var(--text-muted)">${esc(c.name)}</small></td><td>${esc(c.location)}</td>
+        <td><select onchange="assignIncharge('${esc(c.id)}', this.value)">
+          <option value="">— Unassigned —</option>
+          ${incharges.map(u => `<option value="${u.id}" ${u.id === c.incharge_user_id ? 'selected' : ''}>${esc(u.display_name)}</option>`).join('')}
+        </select></td></tr>`).join('') : '<tr><td colspan="3" style="color:var(--text-muted)">No cameras have connected yet.</td></tr>';
+      el('rolesUsers').innerHTML = users.map(u => `<tr><td>${esc(u.display_name)}</td><td>${esc(u.username)}</td>
+        <td>${u.role === 'admin' ? 'Admin' : 'Site in-charge'}</td>
+        <td>${u.id === currentUser.id ? '' : `<button class="btn-sm" onclick="deleteUser(${u.id})">Remove</button>`}</td></tr>`).join('');
+      el('rolesModal').style.display = 'flex';
+    }
+
+    async function assignIncharge(camId, userId) {
+      try {
+        await api(`/api/cameras/${encodeURIComponent(camId)}/incharge`, { method: 'PUT',
+          body: JSON.stringify({ user_id: userId ? Number(userId) : null }) });
+      } catch (e) { el('rolesError').innerText = e.message; }
+    }
+
+    async function addUser() {
+      try {
+        await api('/api/users', { method: 'POST', body: JSON.stringify({
+          display_name: el('newName').value, username: el('newUsername').value,
+          password: el('newPassword').value, role: el('newRole').value }) });
+        ['newName', 'newUsername', 'newPassword'].forEach(id => el(id).value = '');
+        openRoles();
+      } catch (e) { el('rolesError').innerText = e.message; }
+    }
+
+    async function deleteUser(id) {
+      if (!confirm('Remove this user? Their cameras become unassigned.')) return;
+      try { await api(`/api/users/${id}`, { method: 'DELETE' }); openRoles(); }
+      catch (e) { el('rolesError').innerText = e.message; }
+    }
+
     // ── WebSocket Live Push ──
     function initWebSocket() {
       const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const ws = new WebSocket(`${proto}//${location.host}/ws`);
-      ws.onmessage = () => { fetchOverview(); };
-      ws.onclose = () => { setTimeout(initWebSocket, 2500); };
+      const ws = new WebSocket(`${proto}//${location.host}/ws?token=${encodeURIComponent(authToken || '')}`);
+      window._ws = ws;
+      ws.onmessage = (msg) => {
+        let data = {};
+        try { data = JSON.parse(msg.data); } catch (e) {}
+        if (data.event === 'notification') onNotification(data.data);
+        else fetchOverview();
+      };
+      ws.onclose = () => { window._ws = null; setTimeout(initWebSocket, 2500); };
     }
 
     // Initial load & Polling fallback
     fetchOverview();
     initWebSocket();
+    loadSession().catch(() => {});
     setInterval(fetchOverview, 3000);
     setInterval(fetchStreamStatus, 2500);
   </script>
