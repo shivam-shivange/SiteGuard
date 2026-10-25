@@ -19,6 +19,7 @@ from app.database import record_camera_processing
 from app.detection.inference import camera_inference_engines
 from app.detection.model_manager import model_manager
 from app.services.event_manager import handle_incident_event, handle_incident_update
+from app.services.frame_cache import set_frame
 from app.services.safety_engine import SafetyEngine
 from app.websocket_hub import ws_hub
 
@@ -95,11 +96,13 @@ class FrameProcessingQueue:
                 self.last_fps = float(stats.get("fps", 0.0))
                 self.last_processed_at = time.time()
 
-                # Persist latest annotated frame and per-camera stats for the dashboard
+                # Persist latest annotated frame in memory and disk for the dashboard
                 if annotated_frame is not None:
-                    ok, encoded = cv2.imencode(".jpg", annotated_frame)
+                    ok, encoded = cv2.imencode(".jpg", annotated_frame, [int(cv2.IMWRITE_JPEG_QUALITY), 75])
                     if ok:
-                        (LATEST_DIR / f"{camera_id}.jpg").write_bytes(encoded.tobytes())
+                        raw_jpg = encoded.tobytes()
+                        set_frame(camera_id, raw_jpg)
+                        (LATEST_DIR / f"{camera_id}.jpg").write_bytes(raw_jpg)
                 record_camera_processing(
                     camera_id,
                     workers=stats.get("person_count", 0),

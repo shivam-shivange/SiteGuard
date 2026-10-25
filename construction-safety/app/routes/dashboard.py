@@ -1,11 +1,12 @@
 """Dashboard overview, camera feed, and live dynamic parameters routes."""
 from __future__ import annotations
 
+import asyncio
 import time
 from typing import Any
 import psutil
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from pydantic import BaseModel
 
 from app.config import (
@@ -21,6 +22,7 @@ from app.config import (
 from app.database import camera_summary, delete_camera, query, execute, now
 from app.detection.model_manager import model_manager
 from app.routes.camera import sanitize_camera_id
+from app.services.frame_cache import get_frame, get_frame_with_time
 from app.services.frame_queue import frame_queue
 from tools.safety_scorecard import generate_scorecard
 
@@ -151,10 +153,50 @@ async def remove_camera(camera_id: str):
 @router.get("/cameras/{camera_id}/latest-frame")
 async def latest_frame(camera_id: str):
     safe_id = sanitize_camera_id(camera_id, default="")
+    cached = get_frame(safe_id) if safe_id else None
+    if cached is not None:
+        return Response(content=cached, media_type="image/jpeg", headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Pragma": "no-cache",
+        })
+
     path = LATEST_DIR / f"{safe_id}.jpg"
     if not safe_id or not path.is_file():
         raise HTTPException(status_code=404, detail="No frame has been received from this camera")
-    return FileResponse(path, media_type="image/jpeg", headers={"Cache-Control": "no-store"})
+    return FileResponse(path, media_type="image/jpeg", headers={"Cache-Control": "no-store, no-cache, must-revalidate"})
+
+
+@router.get("/cameras/{camera_id}/stream")
+async def camera_stream(camera_id: str):
+    """Real-time multipart/x-mixed-replace MJPEG stream for butter-smooth mobile/web playback."""
+    safe_id = sanitize_camera_id(camera_id, default="")
+    if not safe_id:
+        raise HTTPException(status_code=400, detail="Invalid camera ID")
+
+    async def frame_generator():
+        last_sent_time = 0.0
+        while True:
+            try:
+                frame_bytes, frame_time = get_frame_with_time(safe_id)
+                if frame_bytes and frame_time > last_sent_time:
+                    last_sent_time = frame_time
+                    yield (
+                        b"--frame\r\n"
+                        b"Content-Type: image/jpeg\r\n"
+                        b"Content-Length: " + str(len(frame_bytes)).encode() + b"\r\n\r\n"
+                        + frame_bytes + b"\r\n"
+                    )
+                await asyncio.sleep(0.04)
+            except asyncio.CancelledError:
+                break
+            except Exception:
+                await asyncio.sleep(0.1)
+
+    return StreamingResponse(
+        frame_generator(),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate", "Pragma": "no-cache"},
+    )
 
 
 @router.post("/incidents/resolve-all")

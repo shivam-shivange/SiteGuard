@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 from app.config import LATEST_DIR, MAX_FRAME_BYTES
 from app.database import record_camera_frame, record_heartbeat
+from app.services.frame_cache import set_frame
 from app.services.frame_queue import frame_queue
 
 logger = logging.getLogger("siteguard.routes.camera")
@@ -81,9 +82,12 @@ async def upload_frame(request: Request) -> dict[str, Any]:
     record_camera_frame(camera_id, name, location)
 
     if rot != 0:
-        _, encoded = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
-        (LATEST_DIR / f"{camera_id}.jpg").write_bytes(encoded.tobytes())
+        _, encoded = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+        jpg_data = encoded.tobytes()
+        set_frame(camera_id, jpg_data)
+        (LATEST_DIR / f"{camera_id}.jpg").write_bytes(jpg_data)
     else:
+        set_frame(camera_id, contents)
         (LATEST_DIR / f"{camera_id}.jpg").write_bytes(contents)
 
     queued = await frame_queue.enqueue_frame(camera_id, frame)

@@ -1091,6 +1091,24 @@
 
           <div class="setting-row">
             <div>
+              <b>Mandatory Safety Equipment (PPE)</b>
+              <div style="font-size:11.5px; color:var(--text-muted)">Select safety gear required for all site workers</div>
+            </div>
+            <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; color:#f8fafc;">
+                <input type="checkbox" id="ppeHelmet" value="helmet" checked style="accent-color:var(--cyan); width:16px; height:16px;"> ⛑ Hardhat
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; color:#f8fafc;">
+                <input type="checkbox" id="ppeVest" value="safety_vest" checked style="accent-color:var(--cyan); width:16px; height:16px;"> 🦺 Safety Vest
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; color:#f8fafc;">
+                <input type="checkbox" id="ppeMask" value="mask" checked style="accent-color:var(--cyan); width:16px; height:16px;"> 😷 Face Mask
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div>
               <b>Window Duration</b>
               <div style="font-size:11.5px; color:var(--text-muted)">Sliding temporal buffer</div>
             </div>
@@ -1234,6 +1252,8 @@
       if (tabId === 'videostream') {
         fetchVideoList();
         fetchStreamStatus();
+      } else if (tabId === 'cameras') {
+        updateCameraGrid(window._lastCameras || [], 'fullCamGrid');
       }
     }
 
@@ -1245,6 +1265,7 @@
 
     function closeModal() {
       el('imageModal').style.display = 'none';
+      el('modalImg').src = '';
     }
 
     function toggleTheaterMode() {
@@ -1307,11 +1328,17 @@
     }
 
     async function saveSettings() {
+      const required_ppe = [];
+      if (el('ppeHelmet')?.checked) required_ppe.push('helmet');
+      if (el('ppeVest')?.checked) required_ppe.push('safety_vest');
+      if (el('ppeMask')?.checked) required_ppe.push('mask');
+
       const payload = {
         window_sec: parseFloat(el('paramWindow').value),
         confirm_ratio: parseFloat(el('paramConfirm').value),
         clear_ratio: parseFloat(el('paramClear').value),
-        worker_timeout_sec: parseFloat(el('paramTimeout').value)
+        worker_timeout_sec: parseFloat(el('paramTimeout').value),
+        required_ppe: required_ppe
       };
       try {
         const res = await fetch('/api/config/rules', {
@@ -1519,33 +1546,109 @@
       });
     }
 
-    function renderCameraCard(c) {
-      const isOnline = c.status === 'online';
-      const imgSrc = isOnline ? `/api/cameras/${encodeURIComponent(c.id)}/latest-frame?t=${Date.now()}` : '';
-      return `
-        <div class="cam-box">
-          <div class="cam-head">
-            <div>
-              <span class="pulse-dot" style="background: ${isOnline ? 'var(--green)' : 'var(--red)'}"></span>
-              <b>${c.id}</b> <small style="color:var(--text-muted); margin-left:6px">${c.location || 'Unassigned'}</small>
+    function handleStreamFallback(img, camId) {
+      if (img._polling) return;
+      img._polling = true;
+      let busy = false;
+      function poll() {
+        if (!img.isConnected) return;
+        if (busy) return;
+        busy = true;
+        const next = new Image();
+        next.onload = () => {
+          img.src = next.src;
+          busy = false;
+          setTimeout(poll, 200);
+        };
+        next.onerror = () => {
+          busy = false;
+          setTimeout(poll, 1000);
+        };
+        next.src = `/api/cameras/${encodeURIComponent(camId)}/latest-frame?t=${Date.now()}`;
+      }
+      poll();
+    }
+
+    function updateCameraGrid(cams, containerId) {
+      const container = el(containerId);
+      if (!container) return;
+      if (!cams || !cams.length) {
+        container.innerHTML = '<div style="color:var(--text-muted); padding:20px; grid-column:span 2; text-align:center;">No camera nodes connected.</div>';
+        return;
+      }
+
+      const activeIds = new Set(cams.map(c => c.id));
+      Array.from(container.children).forEach(child => {
+        if (child.id && child.id.startsWith(`cam-box-${containerId}-`)) {
+          const cid = child.id.replace(`cam-box-${containerId}-`, '');
+          if (!activeIds.has(cid)) child.remove();
+        }
+      });
+
+      const placeholder = container.querySelector('div[style*="text-align:center"]');
+      if (placeholder) placeholder.remove();
+
+      cams.forEach(c => {
+        const isOnline = c.status === 'online';
+        const boxId = `cam-box-${containerId}-${c.id}`;
+        let box = el(boxId);
+        const streamUrl = `/api/cameras/${encodeURIComponent(c.id)}/stream`;
+
+        if (!box) {
+          box = document.createElement('div');
+          box.id = boxId;
+          box.className = 'cam-box';
+          box.innerHTML = `
+            <div class="cam-head">
+              <div>
+                <span class="pulse-dot" id="${boxId}-dot" style="background: ${isOnline ? 'var(--green)' : 'var(--red)'}"></span>
+                <b>${esc(c.id)}</b> <small style="color:var(--text-muted); margin-left:6px" id="${boxId}-loc">${esc(c.location || 'Unassigned')}</small>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px">
+                <span class="tag-chip ${isOnline ? 'success' : 'danger'}" id="${boxId}-badge">${c.status.toUpperCase()}</span>
+                <button class="btn-sm" style="padding:2px 8px" onclick="event.stopPropagation(); rotateCamera('${esc(c.id)}')" title="Rotate Feed 90°">↻ Rotate 90°</button>
+                <button class="btn-sm" style="padding:2px 8px" onclick="event.stopPropagation(); openModal('${streamUrl}', 'Camera: ${esc(c.id)} (Live Stream)')" title="Expand Full View">⛶ Expand</button>
+                <button class="btn-sm" style="padding:2px 6px; display:${isOnline ? 'none' : ''}" id="${boxId}-del" onclick="removeCamera('${esc(c.id)}')" title="Dismiss offline node">✕</button>
+              </div>
             </div>
-            <div style="display:flex; align-items:center; gap:8px">
-              <span class="tag-chip ${isOnline ? 'success' : 'danger'}">${c.status.toUpperCase()}</span>
-              ${isOnline ? `<button class="btn-sm" style="padding:2px 8px" onclick="event.stopPropagation(); rotateCamera('${c.id}')" title="Rotate Feed 90°">↻ Rotate 90°</button>` : ''}
-              ${isOnline ? `<button class="btn-sm" style="padding:2px 8px" onclick="event.stopPropagation(); openModal('${imgSrc}', 'Camera: ${c.id} (Widescreen Modal)')" title="Expand Full View">⛶ Expand</button>` : ''}
-              ${!isOnline ? `<button class="btn-sm" style="padding:2px 6px" onclick="removeCamera('${c.id}')" title="Dismiss offline node">✕</button>` : ''}
+            <div class="cam-feed" onclick="openModal('${streamUrl}', 'Camera: ${esc(c.id)}')">
+              ${isOnline ? `<img id="${boxId}-img" src="${streamUrl}" alt="${esc(c.id)} Live Feed" onerror="handleStreamFallback(this, '${esc(c.id)}')">` : `<div class="offline-msg" id="${boxId}-off">Camera node offline<br><small>${timeAgo(c.last_frame_at)}</small></div>`}
             </div>
-          </div>
-          <div class="cam-feed" onclick="openModal('${imgSrc}', 'Camera: ${c.id}')">
-            ${isOnline ? `<img src="${imgSrc}" alt="${c.id} Live Feed">` : `<div class="offline-msg">Camera node offline<br><small>${timeAgo(c.last_frame_at)}</small></div>`}
-          </div>
-          <div class="cam-foot">
-            <span>FPS: <b>${(c.fps || 0).toFixed(1)}</b></span>
-            <span>Latency: <b>${(c.latency_ms || 0).toFixed(0)} ms</b></span>
-            <span>${timeAgo(c.last_frame_at)}</span>
-          </div>
-        </div>
-      `;
+            <div class="cam-foot">
+              <span>FPS: <b id="${boxId}-fps">${(c.fps || 0).toFixed(1)}</b></span>
+              <span>Latency: <b id="${boxId}-latency">${(c.latency_ms || 0).toFixed(0)} ms</b></span>
+              <span id="${boxId}-ago">${timeAgo(c.last_frame_at)}</span>
+            </div>
+          `;
+          container.appendChild(box);
+        } else {
+          const dot = el(`${boxId}-dot`);
+          if (dot) dot.style.background = isOnline ? 'var(--green)' : 'var(--red)';
+          const badge = el(`${boxId}-badge`);
+          if (badge) {
+            badge.className = `tag-chip ${isOnline ? 'success' : 'danger'}`;
+            badge.innerText = c.status.toUpperCase();
+          }
+          const delBtn = el(`${boxId}-del`);
+          if (delBtn) delBtn.style.display = isOnline ? 'none' : '';
+          const fps = el(`${boxId}-fps`);
+          if (fps) fps.innerText = (c.fps || 0).toFixed(1);
+          const lat = el(`${boxId}-latency`);
+          if (lat) lat.innerText = (c.latency_ms || 0).toFixed(0) + ' ms';
+          const ago = el(`${boxId}-ago`);
+          if (ago) ago.innerText = timeAgo(c.last_frame_at);
+          const loc = el(`${boxId}-loc`);
+          if (loc) loc.innerText = esc(c.location || 'Unassigned');
+
+          const feed = box.querySelector('.cam-feed');
+          const img = el(`${boxId}-img`);
+          if (isOnline && !img && feed) {
+            feed.innerHTML = `<img id="${boxId}-img" src="${streamUrl}" alt="${esc(c.id)} Live Feed" onerror="handleStreamFallback(this, '${esc(c.id)}')">`;
+          } else if (!isOnline && img && feed) {
+            feed.innerHTML = `<div class="offline-msg" id="${boxId}-off">Camera node offline<br><small>${timeAgo(c.last_frame_at)}</small></div>`;
+          }
+        }
+      });
     }
 
     function renderWorkerRow(w) {
@@ -1665,11 +1768,13 @@
       el('diagQueue').innerText = `${q} / ${p.max_queue_size || 10} frames`;
       el('diagQueueBar').style.width = `${Math.min(100, (q / 10) * 100)}%`;
 
-      // ── Cameras Grid ──
+      // ── Cameras Grid (Non-destructive smooth stream update) ──
       const cams = d.cameras || [];
-      const camHtml = cams.length ? cams.map(renderCameraCard).join('') : '<div style="color:var(--text-muted); padding:20px; grid-column:span 2; text-align:center;">No camera nodes connected.</div>';
-      el('cameraGrid').innerHTML = camHtml;
-      el('fullCamGrid').innerHTML = camHtml;
+      window._lastCameras = cams;
+      updateCameraGrid(cams, 'cameraGrid');
+      if (el('tab-cameras')?.style.display !== 'none') {
+        updateCameraGrid(cams, 'fullCamGrid');
+      }
 
       // ── Workers List ──
       const ws = d.workers || [];
@@ -1705,6 +1810,11 @@
         el('valClear').innerText = Math.round(m.clear_ratio * 100) + '%';
         el('paramTimeout').value = m.worker_timeout_sec;
         el('valTimeout').innerText = m.worker_timeout_sec + 's';
+        if (m.required_ppe && Array.isArray(m.required_ppe)) {
+          if (el('ppeHelmet')) el('ppeHelmet').checked = m.required_ppe.includes('helmet');
+          if (el('ppeVest')) el('ppeVest').checked = m.required_ppe.includes('safety_vest');
+          if (el('ppeMask')) el('ppeMask').checked = m.required_ppe.includes('mask');
+        }
       }
     }
 
@@ -1880,8 +1990,28 @@
       ws.onmessage = (msg) => {
         let data = {};
         try { data = JSON.parse(msg.data); } catch (e) {}
-        if (data.event === 'notification') onNotification(data.data);
-        else fetchOverview();
+        if (data.event === 'notification') {
+          onNotification(data.data);
+        } else if (data.event_type === 'FRAME_PROCESSED') {
+          if (data.fps !== undefined) {
+            el('cardProcessing').innerText = `${data.fps.toFixed(1)} FPS`;
+            el('cardProcessing').style.color = '#10b981';
+            el('processingBadge').innerText = 'INFERENCE ACTIVE';
+            el('processingBadge').className = 'tag-chip success';
+            el('fpsLatencySub').innerText = `${(data.inference_ms || 0).toFixed(0)} ms • Deep Re-ID Active`;
+
+            ['cameraGrid', 'fullCamGrid'].forEach(gid => {
+              const fEl = el(`cam-box-${gid}-${data.camera_id}-fps`);
+              if (fEl) fEl.innerText = data.fps.toFixed(1);
+              const lEl = el(`cam-box-${gid}-${data.camera_id}-latency`);
+              if (lEl) lEl.innerText = (data.inference_ms || 0).toFixed(0) + ' ms';
+              const aEl = el(`cam-box-${gid}-${data.camera_id}-ago`);
+              if (aEl) aEl.innerText = 'Live now';
+            });
+          }
+        } else {
+          fetchOverview();
+        }
       };
       ws.onclose = () => { window._ws = null; setTimeout(initWebSocket, 2500); };
     }

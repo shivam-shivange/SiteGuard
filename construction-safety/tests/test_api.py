@@ -61,3 +61,22 @@ def test_incidents_list_endpoint():
     response = client.get("/api/incidents/")
     assert response.status_code == 200
     assert "incidents" in response.json()
+
+
+def test_latest_frame_and_mask_rules():
+    from app.services.frame_cache import set_frame
+    dummy_jpeg = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00`\x00`\x00\x00\xff\xdb"
+    set_frame("cam_unit_test", dummy_jpeg)
+
+    # Verify latest-frame
+    resp = client.get("/api/cameras/cam_unit_test/latest-frame")
+    assert resp.status_code == 200
+    assert resp.content == dummy_jpeg
+    assert resp.headers["content-type"] == "image/jpeg"
+
+    # Verify mask is in rules
+    rules_resp = client.get("/api/config/rules")
+    assert rules_resp.status_code == 200
+    rules = rules_resp.json()
+    assert "mask" in rules["required_ppe"]
+

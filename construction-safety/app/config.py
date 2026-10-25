@@ -78,7 +78,7 @@ TRACKER_NAME: str = os.getenv("SITEGUARD_TRACKER", str(TRACKER_CONFIG_PATH) if T
 # again once that share drops to CLEAR_RATIO or below.  One incident is
 # raised per worker per violation episode, never repeatedly while it lasts.
 REQUIRED_PPE: list[str] = [
-    item.strip() for item in os.getenv("SITEGUARD_REQUIRED_PPE", "helmet,safety_vest").split(",")
+    item.strip() for item in os.getenv("SITEGUARD_REQUIRED_PPE", "helmet,safety_vest,mask").split(",")
     if item.strip() in PPE_LABELS
 ]
 CONFIRM_WINDOW_SEC: float = float(os.getenv("SITEGUARD_CONFIRM_WINDOW", "10.0"))
