@@ -116,6 +116,13 @@ class SafetyEngine:
         if state is not None:
             state.incident_id = incident_id
 
+    def reset_camera(self, camera_id: str) -> None:
+        """Remove tracked workers for a specific camera (e.g. upon video rewind or camera reset)."""
+        keys_to_remove = [k for k in self.workers if k[0] == camera_id]
+        for k in keys_to_remove:
+            del self.workers[k]
+        logger.info("Cleared %d tracked workers for camera %s", len(keys_to_remove), camera_id)
+
     # ── Internals ──────────────────────────────────────────────────────
 
     def _trim(self, state: WorkerState, now: float) -> None:
@@ -208,7 +215,11 @@ class SafetyEngine:
 
             if state.confirmed_missing:
                 status = "violation"
+            elif any(v in ("missing", "checking") for v in items.values()):
+                status = "monitoring"
             elif all(value == "ok" for value in items.values()):
+                status = "compliant"
+            elif not any(v in ("missing", "checking") for v in items.values()) and (self._window_full(state, now) or any(v == "ok" for v in items.values())):
                 status = "compliant"
             else:
                 status = "monitoring"

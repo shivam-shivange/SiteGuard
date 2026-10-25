@@ -31,10 +31,10 @@ from app.config import (
     PPE_CONTAINMENT_MIN,
     PPE_LABELS,
     PREPROCESS,
-    TRACKER_NAME,
 )
 from app.detection.model_manager import model_manager
 from app.detection.preprocessor import preprocess
+from app.detection.tracker import get_camera_tracker
 
 logger = logging.getLogger("siteguard.inference")
 
@@ -129,6 +129,27 @@ def _attach_ppe(
     return persons
 
 
+def _draw(
+    frame: np.ndarray,
+    people: list[tuple[int, Box]],
+    ppe_boxes: list[tuple[str, str, float, Box]],
+) -> np.ndarray:
+    """Draw tracked workers and PPE boxes that passed the confidence gates."""
+    out = frame.copy()
+    for item, state, conf, box in ppe_boxes:
+        color = (0, 200, 0) if state == "ok" else (0, 0, 255)
+        x1, y1, x2, y2 = map(int, box)
+        cv2.rectangle(out, (x1, y1), (x2, y2), color, 2)
+        cv2.putText(out, f"{item if state == 'ok' else 'no_' + item} {conf:.2f}",
+                    (x1, max(y1 - 4, 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 1)
+    for tid, box in people:
+        x1, y1, x2, y2 = map(int, box)
+        cv2.rectangle(out, (x1, y1), (x2, y2), (255, 200, 0), 2)
+        cv2.putText(out, f"Worker #{tid}", (x1, max(y1 - 6, 12)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 200, 0), 2)
+    return out
+
+
 # ── Public API ─────────────────────────────────────────────────────────
 
 def run_inference(camera_id: str, frame: np.ndarray) -> InferenceResult:
@@ -150,54 +171,57 @@ def run_inference(camera_id: str, frame: np.ndarray) -> InferenceResult:
 
     # ── 2. YOLO + Tracker (BoT-SORT with Re-ID / ByteTrack) ─────────────
     model = _get_camera_model(camera_id)
-    result = model.track(
+    tracker = get_camera_tracker(camera_id)
+    result = model.predict(
         processed,
-        persist=True,
-        tracker=TRACKER_NAME,
-        conf=MODEL_CONFIDENCE,
+        # Low enough for ByteTrack's second (low-confidence) association stage.
+        conf=min(MODEL_CONFIDENCE, tracker.low_thresh),
         iou=MODEL_IOU,
         verbose=False,
     )[0]
 
-    annotated = result.plot()
-    inference_ms = (time.perf_counter() - t0) * 1000
-
     # ── 3. Parse & class-filter detections ─────────────────────────────
     raw_objects: list[dict[str, Any]] = []
-    people: list[tuple[int, Box]] = []
+    person_dets: list[tuple[Box, float]] = []
     ppe_boxes: list[tuple[str, str, float, Box]] = []
 
     if result.boxes is not None:
-        track_ids = (
-            result.boxes.id.int().tolist()
-            if result.boxes.id is not None
-            else [-1] * len(result.boxes)
-        )
-        for box, cls_id, conf, tid in zip(
+        for box, cls_id, conf in zip(
             result.boxes.xyxy.tolist(),
             result.boxes.cls.int().tolist(),
             result.boxes.conf.tolist(),
-            track_ids,
         ):
             label = MODEL_LABELS.get(cls_id, str(cls_id))
+            normalised = label.lower()
+
+            # Persons are gated by the tracker itself (high/low thresholds)
+            if normalised == "person":
+                person_dets.append((tuple(box), float(conf)))
+                continue
 
             # Per-class confidence gate
             if conf < CLASS_CONFIDENCE.get(label, MODEL_CONFIDENCE):
                 continue
-
             raw_objects.append({
                 "label": label,
                 "confidence": round(float(conf), 3),
-                "track_id": int(tid),
+                "track_id": -1,
                 "box": [round(float(v), 1) for v in box],
             })
-
-            normalised = label.lower()
-            if normalised == "person":
-                people.append((int(tid), tuple(box)))
-            elif normalised in _PPE_BY_LABEL:
+            if normalised in _PPE_BY_LABEL:
                 item, state = _PPE_BY_LABEL[normalised]
                 ppe_boxes.append((item, state, float(conf), tuple(box)))
+
+    # Persons only go through the worker tracker -> stable Worker #1, #2, ...
+    people = tracker.update(person_dets)
+    for tid, box in people:
+        raw_objects.append({
+            "label": "Person", "confidence": 1.0, "track_id": tid,
+            "box": [round(float(v), 1) for v in box],
+        })
+
+    annotated = _draw(frame, people, ppe_boxes)
+    inference_ms = (time.perf_counter() - t0) * 1000
 
     # ── 4. Attach PPE detections to the person wearing (or lacking) them ─
     persons = _attach_ppe(people, ppe_boxes)

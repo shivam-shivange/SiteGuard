@@ -1,12 +1,15 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SiteGuard — AI Construction Safety Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg: #070d19;
@@ -29,7 +32,12 @@
       --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       background: var(--bg);
       color: var(--text);
@@ -38,11 +46,16 @@
       display: flex;
       overflow-x: hidden;
       background-image: radial-gradient(circle at 15% 15%, rgba(14, 165, 233, 0.05) 0%, transparent 40%),
-                        radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.03) 0%, transparent 40%);
+        radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.03) 0%, transparent 40%);
     }
 
     /* ── Layout ── */
-    .app { display: flex; width: 100%; min-height: 100vh; }
+    .app {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
     .sidebar {
       width: 250px;
       background: #091220;
@@ -52,6 +65,7 @@
       flex-direction: column;
       flex-shrink: 0;
     }
+
     .logo {
       font-size: 20px;
       font-weight: 800;
@@ -62,6 +76,7 @@
       margin-bottom: 28px;
       padding-left: 8px;
     }
+
     .logo-badge {
       width: 32px;
       height: 32px;
@@ -75,9 +90,17 @@
       font-size: 16px;
       box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
     }
-    .logo span { color: var(--cyan); }
 
-    .nav-group { display: flex; flex-direction: column; gap: 6px; }
+    .logo span {
+      color: var(--cyan);
+    }
+
+    .nav-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
     .nav-btn {
       display: flex;
       align-items: center;
@@ -93,17 +116,24 @@
       transition: all 0.2s ease;
       text-align: left;
     }
+
     .nav-btn:hover {
       background: rgba(30, 41, 59, 0.6);
       color: var(--text);
     }
+
     .nav-btn.active {
       background: linear-gradient(90deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.05));
       color: #38bdf8;
       border-color: rgba(14, 165, 233, 0.3);
       box-shadow: 0 0 12px rgba(14, 165, 233, 0.1);
     }
-    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .nav-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
 
     .sidebar-footer {
       margin-top: auto;
@@ -112,6 +142,7 @@
       font-size: 12px;
       color: var(--text-muted);
     }
+
     .pulse-dot {
       display: inline-block;
       width: 8px;
@@ -122,7 +153,20 @@
       box-shadow: 0 0 8px var(--green);
       animation: pulse 2s infinite;
     }
-    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+    @keyframes pulse {
+      0% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.6;
+      }
+    }
 
     /* ── Main View ── */
     .main-content {
@@ -131,23 +175,32 @@
       max-width: 1650px;
       overflow-y: auto;
     }
+
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
     }
+
     .header-title h1 {
       font-size: 26px;
       font-weight: 800;
       letter-spacing: -0.5px;
     }
+
     .header-title p {
       font-size: 13px;
       color: var(--text-muted);
       margin-top: 4px;
     }
-    .header-actions { display: flex; align-items: center; gap: 12px; }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .live-pill {
       display: flex;
       align-items: center;
@@ -161,11 +214,13 @@
       font-weight: 700;
       letter-spacing: 0.5px;
     }
+
     .live-pill.offline {
       background: var(--red-glow);
       border-color: rgba(239, 68, 68, 0.35);
       color: #f87171;
     }
+
     .btn-action {
       background: #17253b;
       color: #bae6fd;
@@ -180,12 +235,18 @@
       gap: 6px;
       transition: all 0.2s;
     }
-    .btn-action:hover { background: #203554; border-color: #38bdf8; }
+
+    .btn-action:hover {
+      background: #203554;
+      border-color: #38bdf8;
+    }
+
     .btn-action.primary {
       background: linear-gradient(135deg, #0284c7, #0ea5e9);
       color: #fff;
       border-color: #38bdf8;
     }
+
     .btn-action.primary:hover {
       background: linear-gradient(135deg, #0369a1, #0284c7);
     }
@@ -197,6 +258,7 @@
       gap: 16px;
       margin-bottom: 24px;
     }
+
     .card {
       background: var(--card-bg);
       backdrop-filter: blur(8px);
@@ -207,16 +269,19 @@
       overflow: hidden;
       transition: transform 0.2s, border-color 0.2s;
     }
+
     .card:hover {
       border-color: var(--card-border-glow);
       transform: translateY(-2px);
     }
+
     .card-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
     }
+
     .card-label {
       font-size: 11.5px;
       font-weight: 700;
@@ -224,12 +289,14 @@
       letter-spacing: 0.6px;
       text-transform: uppercase;
     }
+
     .card-icon {
       font-size: 18px;
       padding: 6px;
       border-radius: 8px;
-      background: rgba(255,255,255,0.03);
+      background: rgba(255, 255, 255, 0.03);
     }
+
     .card-val {
       font-size: 32px;
       font-weight: 800;
@@ -237,6 +304,7 @@
       line-height: 1.1;
       letter-spacing: -1px;
     }
+
     .card-sub {
       font-size: 12px;
       color: var(--text-muted);
@@ -245,6 +313,7 @@
       align-items: center;
       gap: 6px;
     }
+
     .tag-chip {
       padding: 2px 7px;
       border-radius: 6px;
@@ -252,17 +321,43 @@
       font-weight: 700;
       text-transform: uppercase;
     }
-    .tag-chip.danger { background: var(--red-glow); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .tag-chip.success { background: var(--green-glow); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .tag-chip.amber { background: var(--amber-glow); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .tag-chip.cyan { background: var(--cyan-glow); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); }
+
+    .tag-chip.danger {
+      background: var(--red-glow);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .tag-chip.success {
+      background: var(--green-glow);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .tag-chip.amber {
+      background: var(--amber-glow);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .tag-chip.cyan {
+      background: var(--cyan-glow);
+      color: #38bdf8;
+      border: 1px solid rgba(14, 165, 233, 0.3);
+    }
 
     /* ── Grid Sections ── */
     .dashboard-layout {
       display: grid;
       grid-template-columns: 1.8fr 1fr;
       gap: 20px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    .dashboard-layout.theater-mode {
+      grid-template-columns: 1fr;
+    }
+
     .panel {
       background: var(--card-bg);
       backdrop-filter: blur(8px);
@@ -271,12 +366,14 @@
       padding: 22px;
       margin-bottom: 20px;
     }
+
     .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 18px;
     }
+
     .panel-title {
       font-size: 15px;
       font-weight: 700;
@@ -284,52 +381,77 @@
       align-items: center;
       gap: 8px;
     }
-    .panel-sub { font-size: 12px; color: var(--text-muted); }
+
+    .panel-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
 
     /* ── Camera Grid ── */
     .cam-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      grid-template-columns: 1fr;
+      gap: 20px;
     }
+
     .cam-box {
       border: 1px solid var(--card-border);
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
       background: #091220;
       transition: all 0.2s;
     }
-    .cam-box:hover { border-color: rgba(14, 165, 233, 0.4); }
+
+    .cam-box:hover {
+      border-color: rgba(14, 165, 233, 0.4);
+    }
+
     .cam-head {
-      padding: 10px 14px;
+      padding: 12px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(14, 23, 38, 0.8);
-      font-size: 12.5px;
+      background: rgba(14, 23, 38, 0.85);
+      font-size: 13.5px;
       font-weight: 600;
     }
+
     .cam-feed {
-      height: 220px;
-      background: #040913;
+      height: 440px;
+      min-height: 380px;
+      background: #020612;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       cursor: pointer;
+      overflow: hidden;
+      box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.7);
     }
-    .cam-feed img { width: 100%; height: 100%; object-fit: contain; }
+
+    .theater-mode .cam-feed {
+      height: 580px;
+    }
+
+    .cam-feed img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
     .cam-feed .offline-msg {
       color: var(--text-muted);
-      font-size: 12px;
+      font-size: 13px;
       text-align: center;
     }
+
     .cam-foot {
-      padding: 8px 12px;
+      padding: 10px 16px;
       display: flex;
       justify-content: space-between;
-      background: rgba(14, 23, 38, 0.8);
-      font-size: 11px;
+      background: rgba(14, 23, 38, 0.85);
+      font-size: 12px;
       font-family: var(--font-mono);
       color: var(--text-muted);
     }
@@ -345,9 +467,24 @@
       border: 1px solid rgba(51, 65, 85, 0.25);
       margin-bottom: 8px;
     }
-    .worker-meta { display: flex; align-items: center; gap: 12px; }
-    .worker-id { font-weight: 700; font-size: 14px; }
-    .ppe-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .worker-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .worker-id {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .ppe-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
     .ppe-badge {
       padding: 4px 9px;
       border-radius: 20px;
@@ -357,10 +494,30 @@
       align-items: center;
       gap: 4px;
     }
-    .ppe-badge.ok { background: var(--green-glow); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .ppe-badge.missing { background: var(--red-glow); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .ppe-badge.checking { background: var(--amber-glow); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .ppe-badge.unknown { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.2); }
+
+    .ppe-badge.ok {
+      background: var(--green-glow);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .ppe-badge.missing {
+      background: var(--red-glow);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .ppe-badge.checking {
+      background: var(--amber-glow);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .ppe-badge.unknown {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-muted);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
 
     /* ── Incidents Feed ── */
     .incident-item {
@@ -370,15 +527,33 @@
       border: 1px solid rgba(51, 65, 85, 0.3);
       margin-bottom: 10px;
     }
+
     .incident-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
     }
-    .incident-title { font-weight: 700; font-size: 13.5px; color: #fca5a5; }
-    .incident-meta { font-size: 11.5px; color: var(--text-muted); display: flex; gap: 10px; }
-    .incident-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+    .incident-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: #fca5a5;
+    }
+
+    .incident-meta {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+    }
+
+    .incident-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
     .btn-sm {
       padding: 5px 10px;
       border-radius: 6px;
@@ -390,14 +565,42 @@
       color: #e2e8f0;
       transition: all 0.2s;
     }
-    .btn-sm:hover { background: #334155; }
-    .btn-sm.resolve { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; }
-    .btn-sm.resolve:hover { background: rgba(16, 185, 129, 0.3); }
-    .btn-sm.danger { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; }
+
+    .btn-sm:hover {
+      background: #334155;
+    }
+
+    .btn-sm.resolve {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+
+    .btn-sm.resolve:hover {
+      background: rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-sm.danger {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
 
     /* ── Progress & Gauge Bars ── */
-    .bar-wrap { width: 100%; height: 6px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-top: 8px; }
-    .bar-fill { height: 100%; background: var(--cyan); transition: width 0.4s; }
+    .bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: #1e293b;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--cyan);
+      transition: width 0.4s;
+    }
 
     /* ── Video Simulation Dropzone & Controls ── */
     .dropzone {
@@ -410,11 +613,17 @@
       transition: all 0.2s;
       margin-bottom: 18px;
     }
-    .dropzone:hover, .dropzone.dragover {
+
+    .dropzone:hover,
+    .dropzone.dragover {
       background: rgba(14, 165, 233, 0.08);
       border-color: var(--cyan);
     }
-    .dropzone-icon { font-size: 36px; margin-bottom: 8px; }
+
+    .dropzone-icon {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
 
     .stream-control-grid {
       display: grid;
@@ -427,6 +636,7 @@
       border-radius: 10px;
       border: 1px solid var(--card-border);
     }
+
     .input-field {
       width: 100%;
       background: #091220;
@@ -448,14 +658,15 @@
       justify-content: center;
       z-index: 1000;
     }
+
     .modal-card {
       background: #0e1726;
       border: 1px solid #334155;
       border-radius: 16px;
       padding: 24px;
-      max-width: 900px;
-      width: 90%;
-      max-height: 90vh;
+      max-width: 1200px;
+      width: 95%;
+      max-height: 92vh;
       overflow-y: auto;
     }
 
@@ -468,6 +679,7 @@
       padding: 14px 0;
       border-bottom: 1px solid rgba(51, 65, 85, 0.3);
     }
+
     input[type=range] {
       accent-color: var(--cyan);
       width: 100%;
@@ -476,17 +688,36 @@
 
     /* Responsive */
     @media (max-width: 1100px) {
-      .metric-grid { grid-template-columns: repeat(2, 1fr); }
-      .dashboard-layout { grid-template-columns: 1fr; }
-      .stream-control-grid { grid-template-columns: 1fr; }
+      .metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .stream-control-grid {
+        grid-template-columns: 1fr;
+      }
     }
+
     @media (max-width: 768px) {
-      .app { flex-direction: column; }
-      .sidebar { width: 100%; }
-      .metric-grid, .cam-grid { grid-template-columns: 1fr; }
+      .app {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+
+      .metric-grid,
+      .cam-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="app">
     <!-- ── Sidebar ── -->
@@ -600,7 +831,7 @@
 
       <!-- ── TAB 1: OVERVIEW TAB ── -->
       <div id="tab-overview">
-        <div class="dashboard-layout">
+        <div class="dashboard-layout" id="mainDashboardLayout">
           <!-- Left Column: Live Feeds & Workers -->
           <div>
             <div class="panel">
@@ -610,31 +841,20 @@
                   <div class="panel-sub">Wireless ESP32-CAM nodes, webcams & looped video tests</div>
                 </div>
                 <div style="display:flex; gap:8px">
+                  <button class="btn-sm" id="btnTheater" onclick="toggleTheaterMode()">⛶ Theater Widescreen</button>
                   <button class="btn-sm" onclick="switchTab('videostream')">+ Video Stream</button>
                   <button class="btn-sm" onclick="switchTab('cameras')">Expand All →</button>
                 </div>
               </div>
               <div class="cam-grid" id="cameraGrid">
-                <div class="cam-box"><div class="cam-feed"><div class="offline-msg">No cameras streaming.</div></div></div>
-              </div>
-            </div>
-
-            <div class="panel">
-              <div class="panel-header">
-                <div>
-                  <div class="panel-title">Active Workers Tracked On Site</div>
-                  <div class="panel-sub">Temporal PPE compliance checklist via BoT-SORT</div>
+                <div class="cam-box">
+                  <div class="cam-feed">
+                    <div class="offline-msg">No cameras streaming.</div>
+                  </div>
                 </div>
-                <span class="tag-chip cyan" id="workerCountTag">0 Workers</span>
-              </div>
-              <div id="workerList">
-                <div style="text-align: center; color: var(--text-muted); padding: 30px;">No workers currently in camera frame.</div>
               </div>
             </div>
-          </div>
 
-          <!-- Right Column: Incidents Stream & Health -->
-          <div>
             <div class="panel">
               <div class="panel-header">
                 <div>
@@ -645,6 +865,23 @@
               </div>
               <div id="incidentList">
                 <div style="text-align: center; color: var(--text-muted); padding: 30px;">No open incidents.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Workers Stream & Health -->
+          <div>
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Active Workers Tracked On Site</div>
+                  <div class="panel-sub">Temporal PPE compliance monitoring & ByteTrack</div>
+                </div>
+                <span class="tag-chip cyan" id="workerCountTag">0 Workers</span>
+              </div>
+              <div id="workerList">
+                <div style="text-align: center; color: var(--text-muted); padding: 30px;">No workers currently in camera
+                  frame.</div>
               </div>
             </div>
 
@@ -658,21 +895,27 @@
                     <span style="color:var(--text-muted)">CPU Workload (Ryzen 5)</span>
                     <b id="diagCpu">—%</b>
                   </div>
-                  <div class="bar-wrap"><div class="bar-fill" id="diagCpuBar" style="width: 0%"></div></div>
+                  <div class="bar-wrap">
+                    <div class="bar-fill" id="diagCpuBar" style="width: 0%"></div>
+                  </div>
                 </div>
                 <div>
                   <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                     <span style="color:var(--text-muted)">RAM Allocation</span>
                     <b id="diagRam">—%</b>
                   </div>
-                  <div class="bar-wrap"><div class="bar-fill" id="diagRamBar" style="width: 0%; background: #38bdf8;"></div></div>
+                  <div class="bar-wrap">
+                    <div class="bar-fill" id="diagRamBar" style="width: 0%; background: #38bdf8;"></div>
+                  </div>
                 </div>
                 <div>
                   <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                     <span style="color:var(--text-muted)">Inference Queue Buffer</span>
                     <b id="diagQueue">0 / 10 frames</b>
                   </div>
-                  <div class="bar-wrap"><div class="bar-fill" id="diagQueueBar" style="width: 0%; background: #fbbf24;"></div></div>
+                  <div class="bar-wrap">
+                    <div class="bar-fill" id="diagQueueBar" style="width: 0%; background: #fbbf24;"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -692,7 +935,7 @@
               + Stream Looped Video
             </button>
           </div>
-          <div class="cam-grid" id="fullCamGrid" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="cam-grid" id="fullCamGrid" style="grid-template-columns: 1fr;">
           </div>
         </div>
       </div>
@@ -703,7 +946,8 @@
           <div class="panel-header">
             <div>
               <div class="panel-title">🎬 Construction Site Video Simulation & Looped Testing</div>
-              <div class="panel-sub">Upload an authentic construction site video file and run it continuously through the YOLO + BoT-SORT pipeline as a virtual camera feed.</div>
+              <div class="panel-sub">Upload an authentic construction site video file and run it continuously through
+                the YOLO + BoT-SORT pipeline as a virtual camera feed.</div>
             </div>
             <span class="tag-chip cyan" id="streamStatusBadge">IDLE</span>
           </div>
@@ -712,9 +956,12 @@
           <div class="dropzone" id="videoDropzone" onclick="el('videoFileInput').click()">
             <div class="dropzone-icon">📁</div>
             <h3 style="font-size:16px; margin-bottom:4px">Click or Drag & Drop Construction Video File</h3>
-            <p style="font-size:12px; color:var(--text-muted)">Supported formats: MP4, AVI, MOV, MKV, WEBM (e.g., worker safety footage)</p>
-            <input type="file" id="videoFileInput" accept=".mp4,.avi,.mov,.mkv,.webm" style="display:none" onchange="handleVideoFileSelect(event)">
-            <div id="uploadProgressText" style="margin-top:10px; font-weight:700; color:var(--cyan); display:none">Uploading video...</div>
+            <p style="font-size:12px; color:var(--text-muted)">Supported formats: MP4, AVI, MOV, MKV, WEBM (e.g., worker
+              safety footage)</p>
+            <input type="file" id="videoFileInput" accept=".mp4,.avi,.mov,.mkv,.webm" style="display:none"
+              onchange="handleVideoFileSelect(event)">
+            <div id="uploadProgressText" style="margin-top:10px; font-weight:700; color:var(--cyan); display:none">
+              Uploading video...</div>
           </div>
 
           <!-- Stream Configuration & Launcher -->
@@ -733,7 +980,8 @@
               <label style="font-size:11px; font-weight:700; color:var(--text-muted)">
                 STREAM PACING: <span id="valFpsDisplay" style="color:var(--cyan)">5.0 FPS</span>
               </label>
-              <input type="range" id="streamFpsRange" min="1" max="25" step="1" value="5" style="margin-top:8px" oninput="el('valFpsDisplay').innerText = this.value + '.0 FPS'">
+              <input type="range" id="streamFpsRange" min="1" max="25" step="1" value="5" style="margin-top:8px"
+                oninput="el('valFpsDisplay').innerText = this.value + '.0 FPS'">
             </div>
             <div style="display:flex; gap:10px; align-items:center; margin-top:14px">
               <label style="font-size:12px; display:flex; align-items:center; gap:6px; cursor:pointer">
@@ -786,7 +1034,8 @@
             <div class="panel-title">Safety Reliability Scorecard</div>
             <span class="tag-chip success" id="scorecardGrade">Grade A+</span>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px;" id="scorecardBreakdown">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px;"
+            id="scorecardBreakdown">
             <!-- Dynamically populated -->
           </div>
         </div>
@@ -817,7 +1066,8 @@
               <b>Window Duration</b>
               <div style="font-size:11.5px; color:var(--text-muted)">Sliding temporal buffer</div>
             </div>
-            <input type="range" id="paramWindow" min="2" max="30" step="1" oninput="el('valWindow').innerText = this.value + 's'">
+            <input type="range" id="paramWindow" min="2" max="30" step="1"
+              oninput="el('valWindow').innerText = this.value + 's'">
             <b id="valWindow">10s</b>
           </div>
 
@@ -826,7 +1076,8 @@
               <b>Confirmation Ratio</b>
               <div style="font-size:11.5px; color:var(--text-muted)">Missing frames share to trigger incident</div>
             </div>
-            <input type="range" id="paramConfirm" min="0.4" max="0.95" step="0.05" oninput="el('valConfirm').innerText = Math.round(this.value * 100) + '%'">
+            <input type="range" id="paramConfirm" min="0.4" max="0.95" step="0.05"
+              oninput="el('valConfirm').innerText = Math.round(this.value * 100) + '%'">
             <b id="valConfirm">70%</b>
           </div>
 
@@ -835,7 +1086,8 @@
               <b>Clearance Ratio</b>
               <div style="font-size:11.5px; color:var(--text-muted)">Missing frames share to reset violation</div>
             </div>
-            <input type="range" id="paramClear" min="0.1" max="0.5" step="0.05" oninput="el('valClear').innerText = Math.round(this.value * 100) + '%'">
+            <input type="range" id="paramClear" min="0.1" max="0.5" step="0.05"
+              oninput="el('valClear').innerText = Math.round(this.value * 100) + '%'">
             <b id="valClear">30%</b>
           </div>
 
@@ -844,7 +1096,8 @@
               <b>Worker Timeout</b>
               <div style="font-size:11.5px; color:var(--text-muted)">Unseen worker expiry time</div>
             </div>
-            <input type="range" id="paramTimeout" min="5" max="30" step="1" oninput="el('valTimeout').innerText = this.value + 's'">
+            <input type="range" id="paramTimeout" min="5" max="30" step="1"
+              oninput="el('valTimeout').innerText = this.value + 's'">
             <b id="valTimeout">10s</b>
           </div>
         </div>
@@ -907,6 +1160,32 @@
 
     function closeModal() {
       el('imageModal').style.display = 'none';
+    }
+
+    function toggleTheaterMode() {
+      const layout = el('mainDashboardLayout');
+      if (!layout) return;
+      const isTheater = layout.classList.toggle('theater-mode');
+      const btn = el('btnTheater');
+      if (btn) {
+        btn.innerText = isTheater ? '✕ Standard View' : '⛶ Theater Widescreen';
+        btn.classList.toggle('resolve', isTheater);
+      }
+    }
+
+    const _camRotations = {};
+    async function rotateCamera(camId) {
+      _camRotations[camId] = ((_camRotations[camId] || 0) + 90) % 360;
+      try {
+        await fetch('/api/camera/rotate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ camera_id: camId, rotation: _camRotations[camId] })
+        });
+        fetchOverview();
+      } catch (e) {
+        console.error('Failed to rotate camera:', e);
+      }
     }
 
     async function removeCamera(camId) {
@@ -1018,7 +1297,7 @@
 
       const pText = el('uploadProgressText');
       pText.style.display = 'block';
-      pText.innerText = `Uploading ${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)...`;
+      pText.innerText = `Uploading ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)...`;
 
       try {
         const res = await fetch('/api/video/upload', {
@@ -1167,6 +1446,8 @@
             </div>
             <div style="display:flex; align-items:center; gap:8px">
               <span class="tag-chip ${isOnline ? 'success' : 'danger'}">${c.status.toUpperCase()}</span>
+              ${isOnline ? `<button class="btn-sm" style="padding:2px 8px" onclick="event.stopPropagation(); rotateCamera('${c.id}')" title="Rotate Feed 90°">↻ Rotate 90°</button>` : ''}
+              ${isOnline ? `<button class="btn-sm" style="padding:2px 8px" onclick="event.stopPropagation(); openModal('${imgSrc}', 'Camera: ${c.id} (Widescreen Modal)')" title="Expand Full View">⛶ Expand</button>` : ''}
               ${!isOnline ? `<button class="btn-sm" style="padding:2px 6px" onclick="removeCamera('${c.id}')" title="Dismiss offline node">✕</button>` : ''}
             </div>
           </div>
@@ -1357,4 +1638,5 @@
     setInterval(fetchStreamStatus, 2500);
   </script>
 </body>
+
 </html>

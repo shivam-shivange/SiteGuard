@@ -78,7 +78,7 @@ TRACKER_NAME: str = os.getenv("SITEGUARD_TRACKER", str(TRACKER_CONFIG_PATH) if T
 # again once that share drops to CLEAR_RATIO or below.  One incident is
 # raised per worker per violation episode, never repeatedly while it lasts.
 REQUIRED_PPE: list[str] = [
-    item.strip() for item in os.getenv("SITEGUARD_REQUIRED_PPE", "helmet,safety_vest,mask").split(",")
+    item.strip() for item in os.getenv("SITEGUARD_REQUIRED_PPE", "helmet,safety_vest").split(",")
     if item.strip() in PPE_LABELS
 ]
 CONFIRM_WINDOW_SEC: float = float(os.getenv("SITEGUARD_CONFIRM_WINDOW", "10.0"))
@@ -90,7 +90,7 @@ MIN_OBSERVATIONS: int     = int(os.getenv("SITEGUARD_MIN_OBSERVATIONS", "3"))
 # Must exceed the camera's frame interval (2 s at 0.5 FPS).
 WORKER_TIMEOUT_SEC: float = float(os.getenv("SITEGUARD_WORKER_TIMEOUT", "10.0"))
 # Share of a PPE box that must lie inside a person box to belong to them.
-PPE_CONTAINMENT_MIN: float = float(os.getenv("SITEGUARD_PPE_CONTAINMENT", "0.5"))
+PPE_CONTAINMENT_MIN: float = float(os.getenv("SITEGUARD_PPE_CONTAINMENT", "0.35"))
 
 SEVERITY: dict[str, str] = {
     "no_helmet":      "high",

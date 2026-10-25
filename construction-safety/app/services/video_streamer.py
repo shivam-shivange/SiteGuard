@@ -17,6 +17,7 @@ import numpy as np
 
 from app.config import LATEST_DIR, VIDEOS_DIR
 from app.database import record_camera_frame
+from app.detection.tracker import reset_camera_tracker
 from app.services.frame_queue import frame_queue
 
 logger = logging.getLogger("siteguard.video_streamer")
@@ -108,6 +109,8 @@ class VideoStreamerManager:
 
         # Stop existing stream on same camera_id if already running
         await self.stop_stream(camera_id)
+        reset_camera_tracker(camera_id)
+        frame_queue.safety_engine.reset_camera(camera_id)
 
         stream = ActiveVideoStream(
             camera_id=camera_id,
@@ -144,6 +147,8 @@ class VideoStreamerManager:
                 pass
 
         del self.active_streams[camera_id]
+        reset_camera_tracker(camera_id)
+        frame_queue.safety_engine.reset_camera(camera_id)
         logger.info("Stopped video stream for camera %s", camera_id)
         return True
 
@@ -200,6 +205,8 @@ class VideoStreamerManager:
                         stream.loops_completed += 1
                         cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                         stream.current_frame = 0
+                        reset_camera_tracker(stream.camera_id)
+                        frame_queue.safety_engine.reset_camera(stream.camera_id)
                         ret, frame = cap.read()
                         if not ret:
                             logger.warning("Failed to rewind video %s", stream.video_path)

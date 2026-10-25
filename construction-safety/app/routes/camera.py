@@ -67,11 +67,24 @@ async def upload_frame(request: Request) -> dict[str, Any]:
     if frame is None:
         raise HTTPException(status_code=400, detail="Failed to decode JPEG frame.")
 
+    # Apply camera rotation if requested (useful when board is mounted on its side)
+    rot = CAMERA_ROTATIONS.get(camera_id, 0)
+    if rot == 90:
+        frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+    elif rot == 180:
+        frame = cv2.rotate(frame, cv2.ROTATE_180)
+    elif rot in (270, -90):
+        frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
     name = request.headers.get("x-camera-name", camera_id)[:80]
     location = request.headers.get("x-camera-location", "Unassigned")[:120]
     record_camera_frame(camera_id, name, location)
-    # Show the raw frame immediately; the worker overwrites it with the annotated one.
-    (LATEST_DIR / f"{camera_id}.jpg").write_bytes(contents)
+
+    if rot != 0:
+        _, encoded = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        (LATEST_DIR / f"{camera_id}.jpg").write_bytes(encoded.tobytes())
+    else:
+        (LATEST_DIR / f"{camera_id}.jpg").write_bytes(contents)
 
     queued = await frame_queue.enqueue_frame(camera_id, frame)
     return {
@@ -80,6 +93,24 @@ async def upload_frame(request: Request) -> dict[str, Any]:
         "bytes_received": len(contents),
         "frame_shape": list(frame.shape),
     }
+
+
+CAMERA_ROTATIONS: dict[str, int] = {}
+
+
+@router.post("/rotate")
+async def rotate_camera(payload: dict[str, Any]):
+    """Set orientation angle (0, 90, 180, 270 degrees) for a camera node."""
+    cam_id = sanitize_camera_id(str(payload.get("camera_id", "")))
+    rot = int(payload.get("rotation", 0)) % 360
+    CAMERA_ROTATIONS[cam_id] = rot
+    return {"status": "success", "camera_id": cam_id, "rotation": rot}
+
+
+@router.get("/rotations")
+async def get_rotations() -> dict[str, Any]:
+    """Get active rotation angles for all camera nodes."""
+    return {"status": "success", "rotations": CAMERA_ROTATIONS}
 
 
 @router.post("/heartbeat")
